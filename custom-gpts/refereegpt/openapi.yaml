@@ -1,0 +1,108 @@
+openapi: 3.1.0
+info:
+  title: RefereeGPT API
+  description: AI referee education tools - law lookups, incident analysis, and knowledge quizzes based on IFAB Laws of the Game.
+  version: 1.0.0
+servers:
+  - url: https://mcp.360tft.com/refereegpt/api
+paths:
+  /check_law:
+    post:
+      operationId: checkLaw
+      summary: Look up any Law of the Game
+      description: Search the complete IFAB Laws of the Game using RAG. Returns accurate, referenced answers with specific law numbers and clauses. Supports 9 country-specific rule variations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: "Your rules question, e.g. 'Can a goalkeeper pick up a throw-in from their own player?'"
+                country:
+                  type: string
+                  description: "Country for local rule variations: england, scotland, usa, australia, canada, ireland, wales, south_africa, new_zealand"
+                refereeLevel:
+                  type: string
+                  description: "Referee level for appropriate detail: beginner, intermediate, advanced"
+      responses:
+        "200":
+          description: Law lookup result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: The law reference and explanation
+  /analyze_incident:
+    post:
+      operationId: analyzeIncident
+      summary: Analyse a match incident with law references
+      description: Describe any match incident and get a detailed analysis explaining which laws apply, the correct decision, and why. Cross-references the full IFAB Laws of the Game.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - description
+              properties:
+                description:
+                  type: string
+                  description: "Describe the incident, e.g. 'A player takes off their shirt after scoring'"
+                country:
+                  type: string
+                  description: "Country for local rule variations"
+      responses:
+        "200":
+          description: Incident analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Detailed incident analysis with law references
+  /generate_quiz:
+    post:
+      operationId: generateQuiz
+      summary: Generate a referee knowledge quiz
+      description: Create referee training quizzes on any topic covering all 17 Laws of the Game. Multiple difficulty levels. Each question includes the correct answer with law references.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - topic
+              properties:
+                topic:
+                  type: string
+                  description: "Topic or law to quiz on, e.g. 'offside', 'handball', 'advantage'"
+                difficulty:
+                  type: string
+                  enum: [easy, medium, hard]
+                  description: "Quiz difficulty level"
+                country:
+                  type: string
+                  description: "Country for local rule variations"
+      responses:
+        "200":
+          description: Generated quiz
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Quiz questions with answers and law references

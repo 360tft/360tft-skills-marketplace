@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: CruiseGPT API
+  description: AI cruise guidance tools - cruise advice, comparisons, and itinerary planning.
+  version: 1.0.0
+servers:
+  - url: https://mcp.360tft.com/cruisegpt/api
+paths:
+  /cruise_advice:
+    post:
+      operationId: cruiseAdvice
+      summary: Get AI cruise guidance
+      description: Ask any cruise question and get expert advice. Covers cruise lines, destinations, cabin selection, onboard experiences, port days, and budgeting. Like having an experienced cruiser on speed dial.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+              properties:
+                question:
+                  type: string
+                  description: "Your cruise question, e.g. 'What's the best cabin for a family of 4 on Royal Caribbean?'"
+                cruiseLine:
+                  type: string
+                  description: "Specific cruise line: Royal Caribbean, MSC, Celebrity, Norwegian, Carnival, Disney, P&O, Virgin Voyages"
+                destination:
+                  type: string
+                  description: "Cruise destination: Caribbean, Mediterranean, Alaska, Northern Europe, Asia"
+      responses:
+        "200":
+          description: Cruise advice response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Expert cruise guidance
+  /compare_cruises:
+    post:
+      operationId: compareCruises
+      summary: Compare cruise lines or sailings
+      description: Compare two cruise lines, ships, or specific sailings side by side. Covers pricing, onboard experience, food quality, entertainment, kids clubs, cabin quality, and value for money.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cruiseA
+                - cruiseB
+              properties:
+                cruiseA:
+                  type: string
+                  description: "First cruise line or sailing to compare, e.g. 'Royal Caribbean Oasis of the Seas'"
+                cruiseB:
+                  type: string
+                  description: "Second cruise line or sailing to compare, e.g. 'MSC World Europa'"
+                criteria:
+                  type: string
+                  description: "What to focus the comparison on, e.g. 'families with young children', 'food quality', 'value for money'"
+      responses:
+        "200":
+          description: Cruise comparison
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Detailed side-by-side comparison
+  /plan_itinerary:
+    post:
+      operationId: planItinerary
+      summary: Plan a port-by-port day itinerary
+      description: Get a detailed day-by-day itinerary for your cruise ports of call. Includes top attractions, excursion recommendations, local food spots, and time management tips for each port.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ports
+              properties:
+                ports:
+                  type: string
+                  description: "Comma-separated list of ports, e.g. 'Barcelona, Marseille, Rome, Naples'"
+                duration:
+                  type: string
+                  description: "Hours in each port if known, e.g. '8 hours per port'"
+                interests:
+                  type: string
+                  description: "Your interests to personalise recommendations, e.g. 'history, local food, beaches, kid-friendly'"
+      responses:
+        "200":
+          description: Port itinerary
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Day-by-day port itinerary with recommendations

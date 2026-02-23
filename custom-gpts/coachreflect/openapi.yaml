@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: CoachReflect API
+  description: AI coaching reflection tools - log reflections, discover patterns, and chat with your coaching AI.
+  version: 1.0.0
+servers:
+  - url: https://mcp.360tft.com/coachreflect/api
+paths:
+  /log_reflection:
+    post:
+      operationId: logReflection
+      summary: Submit a coaching reflection for AI analysis
+      description: Log a coaching session reflection and get AI-powered analysis. Identifies themes, strengths, areas for growth, and actionable next steps based on your reflection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reflection
+              properties:
+                reflection:
+                  type: string
+                  description: "Your coaching reflection, e.g. 'Today's U12 session on pressing went well but I talked too much during the main activity...'"
+                sessionType:
+                  type: string
+                  description: "Type of session: training, match, meeting, observation, cpd"
+                mood:
+                  type: string
+                  description: "How you felt: positive, neutral, frustrated, energised, drained"
+                energy:
+                  type: string
+                  description: "Your energy level: high, medium, low"
+      responses:
+        "200":
+          description: Reflection analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: AI analysis of the reflection with themes and next steps
+  /get_patterns:
+    post:
+      operationId: getPatterns
+      summary: Discover coaching patterns and trends
+      description: Analyse your coaching reflections over time to find patterns, recurring themes, strengths, and areas for development. Helps you see the bigger picture in your coaching journey.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeRange:
+                  type: string
+                  description: "Time range to analyse: last_week, last_month, last_3_months, all_time"
+                focus:
+                  type: string
+                  description: "What to focus on: strengths, challenges, communication, session_design, player_development"
+      responses:
+        "200":
+          description: Pattern analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Coaching patterns and trend analysis
+  /coaching_chat:
+    post:
+      operationId: coachingChat
+      summary: Chat with your coaching reflection AI
+      description: Have a conversation with an AI that understands coaching. Discuss challenges, brainstorm solutions, explore ideas, or just think out loud about your coaching practice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  description: "Your message, e.g. 'I keep struggling with player engagement during warm-ups'"
+                context:
+                  type: string
+                  description: "Additional context about your coaching situation"
+      responses:
+        "200":
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Coaching conversation response

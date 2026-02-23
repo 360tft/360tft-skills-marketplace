@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: FootballGPT API
+  description: AI football coaching tools - session plans, coaching advice, animated drills, player stats, and drill search.
+  version: 1.0.0
+servers:
+  - url: https://mcp.360tft.com/footballgpt/api
+paths:
+  /get_coaching_advice:
+    post:
+      operationId: getCoachingAdvice
+      summary: Get coaching advice from 18 specialist AI advisors
+      description: Ask any football coaching question and get expert guidance. Covers grassroots, academy, professional, goalkeeping, scouting, player development, and Football Manager modes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  description: The coaching question to ask
+                mode:
+                  type: string
+                  enum: [coach, player, fm]
+                  description: "Coaching mode: coach (default), player, or fm (Football Manager)"
+                advisor:
+                  type: string
+                  description: "Specific advisor: grassroots, academy, sunday, pro, gk, scout, general, youth, rising, amateur, physio, sports_scientist, expert, tactician"
+                ageGroup:
+                  type: string
+                  description: "Age group context, e.g. U8, U10, U12, U14, U16, U18, Senior"
+      responses:
+        "200":
+          description: Coaching advice response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: The coaching advice
+  /generate_session_plan:
+    post:
+      operationId: generateSessionPlan
+      summary: Generate a complete training session plan
+      description: Creates a structured session plan with warm-up, main activity, progressions, and cool-down. Tailored to age group, topic, duration, and player count.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - topic
+              properties:
+                topic:
+                  type: string
+                  description: "Session topic, e.g. defending 1v1, passing under pressure, building from the back"
+                ageGroup:
+                  type: string
+                  description: "Target age group, e.g. U10, U14, Senior"
+                duration:
+                  type: integer
+                  description: "Session duration in minutes (default: 60)"
+                playerCount:
+                  type: integer
+                  description: "Expected number of players (default: 16)"
+                format:
+                  type: string
+                  description: "Session format preference"
+      responses:
+        "200":
+          description: Generated session plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: The full session plan
+  /animate_drill:
+    post:
+      operationId: animateDrill
+      summary: Create an animated football drill diagram
+      description: Describe any football drill and get animated diagram data showing player positions, movement patterns, passing sequences, and runs. Returns structured JSON for visual rendering.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - description
+              properties:
+                description:
+                  type: string
+                  description: "Plain English description of the drill, e.g. '4v2 rondo with rotation on loss of possession'"
+                category:
+                  type: string
+                  description: "Drill category: passing, shooting, defending, set-piece, warm-up, fitness"
+                ageGroup:
+                  type: string
+                  description: "Target age group"
+      responses:
+        "200":
+          description: Animated drill data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Drill animation data
+  /search_player_stats:
+    post:
+      operationId: searchPlayerStats
+      summary: Search real player statistics from 100+ leagues
+      description: Access real-time player statistics from over 100 football leagues worldwide. Search by player name, league, position, or season. Includes goals, assists, xG, per-90 metrics.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Player name to search, e.g. Bukayo Saka"
+                league:
+                  type: string
+                  description: "League name, e.g. Premier League, Championship, La Liga"
+                position:
+                  type: string
+                  description: "Player position filter"
+                season:
+                  type: string
+                  description: "Season, e.g. 2024-2025 (defaults to current)"
+                query:
+                  type: string
+                  description: "Natural language query, e.g. 'top 5 scorers in League One'"
+      responses:
+        "200":
+          description: Player statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Player stats data
+  /search_drills:
+    post:
+      operationId: searchDrills
+      summary: Search the football drill library
+      description: Browse and search a library of football training drills by topic, age group, and category. Returns drill names, setup instructions, coaching points, and progressions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: "What kind of drill to search for"
+                category:
+                  type: string
+                  description: "Drill category: passing, shooting, defending, warm-up, fitness, set-piece"
+                ageGroup:
+                  type: string
+                  description: "Target age group"
+      responses:
+        "200":
+          description: Drill search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+                    description: Matching drills
