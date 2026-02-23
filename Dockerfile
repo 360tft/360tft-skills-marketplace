@@ -4,7 +4,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production 2>/dev/null || npm install --only=production
+RUN npm ci 2>/dev/null || npm install
 
 FROM base AS builder
 WORKDIR /app
