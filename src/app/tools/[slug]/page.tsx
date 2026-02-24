@@ -369,7 +369,7 @@ export default function ToolDetailPage({
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--border)] text-sm font-medium text-[var(--foreground)] hover:bg-white/5 transition-colors"
             >
-              Get on 360TFT Store
+              Get on AI Football Store
             </a>
           )}
         </div>

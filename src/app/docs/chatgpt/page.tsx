@@ -4,9 +4,9 @@ import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ChatGPT Custom GPTs | 360TFT Skills Docs",
+  title: "ChatGPT Custom GPTs | AI Football Docs",
   description:
-    "Use 360TFT AI tools as Custom GPTs in ChatGPT. FootballGPT, RefereeGPT, CoachReflect, and CruiseGPT.",
+    "Use AI Football tools as Custom GPTs in ChatGPT. FootballGPT, RefereeGPT, CoachReflect, and CruiseGPT.",
 };
 
 const gpts = [
@@ -74,7 +74,7 @@ export default function ChatGPTDocsPage() {
           ChatGPT Custom GPTs
         </h1>
         <p className="text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
-          360TFT tools are also available as Custom GPTs in ChatGPT. Each GPT
+          AI Football tools are also available as Custom GPTs in ChatGPT. Each GPT
           connects to the same AI backend as the MCP tools, so you get the same
           quality responses in whichever platform you prefer.
         </p>
@@ -140,7 +140,7 @@ export default function ChatGPTDocsPage() {
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] leading-relaxed mb-3">
             Each Custom GPT is configured with an OpenAPI schema that maps to
-            the 360TFT MCP gateway. When you ask a question, ChatGPT calls the
+            the AI Football MCP gateway. When you ask a question, ChatGPT calls the
             same API endpoints used by Claude Desktop and the REST API.
           </p>
           <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
@@ -149,7 +149,7 @@ export default function ChatGPTDocsPage() {
               custom-gpts/
             </code>{" "}
             directory of the 360tft-mcp repository. If you're building your own
-            Custom GPT and want to connect to 360TFT tools, you can use these
+            Custom GPT and want to connect to AI Football tools, you can use these
             schemas as a starting point.
           </p>
         </div>

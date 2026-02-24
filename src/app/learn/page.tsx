@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Learn | 360TFT Skills Marketplace",
+  title: "Learn | AI Football",
   description:
     "Courses for football coaches who want to use AI tools. From installing MCP skills to building your own football AI product.",
 };
@@ -52,14 +52,14 @@ const courses = [
     title: "Builder Bootcamp",
     price: "$497",
     description:
-      "Get the FootballGPT codebase, API keys to all 360TFT products, and a 30-day curriculum to launch your own football AI product. Weekly calls with Coach Kevin.",
+      "Get the FootballGPT codebase, API keys to all AI Football products, and a 30-day curriculum to launch your own football AI product. Weekly calls with Coach Kevin.",
     who: "Entrepreneurs and developers who want to build and sell football AI tools.",
     pain: "Building an AI product from scratch takes months and costs thousands in development. You don't have the codebase, the infrastructure, or the distribution.",
     outcome:
       "In 30 days, you'll have a working football AI product deployed, Stripe payments connected, and your tools listed on this marketplace.",
     includes: [
       "FootballGPT full codebase (Next.js, Supabase, Stripe)",
-      "API keys to all 360TFT products",
+      "API keys to all AI Football products",
       "30-day build curriculum",
       "Weekly group calls with Kevin",
       "Publish tools on this marketplace",

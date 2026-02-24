@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-purple-500" />
-              Built by 360TFT
+              Built by AI Football
             </div>
           </div>
         </div>

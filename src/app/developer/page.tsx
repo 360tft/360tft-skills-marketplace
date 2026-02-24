@@ -291,7 +291,7 @@ export default function DeveloperPage() {
           Developer Portal
         </h1>
         <p className="text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
-          Build AI tools for football coaches using 360TFT infrastructure.
+          Build AI tools for football coaches using AI Football infrastructure.
           Get API access to FootballGPT, RefereeGPT, CoachReflect, and more.
           Publish your tools on this marketplace and earn revenue.
         </p>
@@ -311,7 +311,7 @@ export default function DeveloperPage() {
               API Access
             </h3>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Call any 360TFT tool via REST API. Coaching advice, session
+              Call any AI Football tool via REST API. Coaching advice, session
               plans, law lookups, drill animations, player stats, and more.
             </p>
           </div>

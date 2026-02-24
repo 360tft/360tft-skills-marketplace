@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="border-t border-[var(--border)] mt-16 py-8 px-4">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--muted)]">
         <div className="flex items-center gap-4">
-          <span>Built by 360TFT</span>
+          <span>Built by AI Football</span>
           <a
             href="https://footballgpt.co"
             target="_blank"

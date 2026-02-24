@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           valid: false,
           error: result.error,
           tier: result.tier,
-          upgrade_url: "https://skills.360tft.com/developer",
+          upgrade_url: "https://aifootball.co/developer",
         },
         { status: result.error === "Rate limit exceeded" ? 429 : 401 }
       );

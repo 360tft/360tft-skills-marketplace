@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Claude Desktop Setup | 360TFT Skills Docs",
+  title: "Claude Desktop Setup | AI Football Docs",
   description:
     "Install FootballGPT, RefereeGPT, and CoachReflect in Claude Desktop. Step-by-step guide with config and troubleshooting.",
 };

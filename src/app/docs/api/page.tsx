@@ -4,9 +4,9 @@ import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "API Reference | 360TFT Skills Docs",
+  title: "API Reference | AI Football Docs",
   description:
-    "REST API reference for 360TFT AI tools. Authentication, rate limits, endpoints, and curl examples for all 11 tools.",
+    "REST API reference for AI Football tools. Authentication, rate limits, endpoints, and curl examples for all 11 tools.",
 };
 
 function CodeBlock({ code, label }: { code: string; label?: string }) {
@@ -111,7 +111,7 @@ export default function ApiDocsPage() {
           API Reference
         </h1>
         <p className="text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
-          Call any 360TFT tool via REST API. Get an API key from the{" "}
+          Call any AI Football tool via REST API. Get an API key from the{" "}
           <Link href="/developer" className="text-[var(--accent)] hover:underline">
             Developer Portal
           </Link>

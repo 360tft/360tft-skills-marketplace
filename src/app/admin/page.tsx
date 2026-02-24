@@ -745,7 +745,7 @@ export default function AdminPage() {
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 mb-8">
           <div className="space-y-2.5">
             {[
-              { label: "Skills Marketplace deployed", done: true, note: "skills.360tft.com on Coolify" },
+              { label: "Skills Marketplace deployed", done: true, note: "aifootball.co on Coolify" },
               { label: "Custom GPT schemas written", done: true, note: "4 products, 14 tools" },
               { label: "API key system built", done: true, note: "CRUD + rate limiting + validation" },
               { label: "Admin dashboard built", done: true, note: "You're looking at it" },

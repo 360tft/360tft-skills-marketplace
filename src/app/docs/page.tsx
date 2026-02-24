@@ -4,9 +4,9 @@ import { Footer } from "@/components/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Documentation | 360TFT Skills Marketplace",
+  title: "Documentation | AI Football",
   description:
-    "Setup guides, API reference, and integration docs for 360TFT AI tools. Install to Claude Desktop, use the REST API, or connect via ChatGPT.",
+    "Setup guides, API reference, and integration docs for AI Football tools. Install to Claude Desktop, use the REST API, or connect via ChatGPT.",
 };
 
 const guides = [
@@ -35,7 +35,7 @@ const guides = [
   {
     title: "ChatGPT Custom GPTs",
     description:
-      "Use 360TFT tools as Custom GPTs in ChatGPT. Links to GPT Store listings and setup instructions.",
+      "Use AI Football tools as Custom GPTs in ChatGPT. Links to GPT Store listings and setup instructions.",
     href: "/docs/chatgpt",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@ export default function DocsPage() {
           Documentation
         </h1>
         <p className="text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
-          360TFT Skills gives coaches, developers, and entrepreneurs access to
+          AI Football gives coaches, developers, and entrepreneurs access to
           AI tools built specifically for football. Install them in Claude
           Desktop, call them via REST API, or use them as ChatGPT Custom GPTs.
         </p>
@@ -75,7 +75,7 @@ export default function DocsPage() {
               Developers
             </h3>
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Build on top of the 360TFT API. Free tier gives you 10 calls/day.
+              Build on top of the AI Football API. Free tier gives you 10 calls/day.
               Developer tier ($29/month) gives you 1,000.
             </p>
           </div>

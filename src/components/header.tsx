@@ -10,10 +10,10 @@ export function Header() {
           </div>
           <div>
             <span className="font-semibold text-[var(--foreground)] text-sm">
-              360TFT Skills
+              AI Football
             </span>
             <span className="text-[var(--muted)] text-xs ml-1.5 hidden sm:inline">
-              AI tools for football
+              The AI agent marketplace
             </span>
           </div>
         </Link>
