@@ -7,9 +7,26 @@ const PRODUCT_URLS: Record<string, string> = {
   coachreflect: "https://coachreflection.com",
 };
 
-// Map tool names (underscore) to API action paths (hyphenated)
+// Map MCP tool names to product API action paths
+const TOOL_TO_ACTION: Record<string, string> = {
+  // FootballGPT
+  get_coaching_advice: "coaching-advice",
+  generate_session_plan: "session-plan",
+  animate_drill: "animate-drill",
+  search_player_stats: "search-stats",
+  search_drills: "search-drills",
+  // RefereeGPT
+  check_law: "check-law",
+  analyze_incident: "analyze-incident",
+  generate_quiz: "generate-quiz",
+  // CoachReflect
+  log_reflection: "log-reflection",
+  get_patterns: "get-patterns",
+  coaching_chat: "coaching-chat",
+};
+
 function toolNameToAction(mcpToolName: string): string {
-  return mcpToolName.replace(/_/g, "-");
+  return TOOL_TO_ACTION[mcpToolName] || mcpToolName.replace(/_/g, "-");
 }
 
 // Simple in-memory rate limiting
