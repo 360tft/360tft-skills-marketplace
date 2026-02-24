@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import type { ToolCategory } from "@/data/tools";
 import { CATEGORIES } from "@/data/tools";
 
-type SortOption = "popular" | "newest" | "rating";
+type SortOption = "popular" | "newest";
 
 interface SearchFilterProps {
   onSearch: (query: string) => void;
@@ -93,7 +93,6 @@ export function SearchFilter({
             [
               { value: "popular", label: "Popular" },
               { value: "newest", label: "Newest" },
-              { value: "rating", label: "Top Rated" },
             ] as { value: SortOption; label: string }[]
           ).map((sort) => (
             <button

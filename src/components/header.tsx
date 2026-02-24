@@ -26,8 +26,20 @@ export function Header() {
             Browse
           </Link>
           <Link
-            href="/developer"
+            href="/docs"
             className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+          >
+            Docs
+          </Link>
+          <Link
+            href="/learn"
+            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+          >
+            Learn
+          </Link>
+          <Link
+            href="/developer"
+            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors hidden sm:inline"
           >
             Developers
           </Link>
@@ -35,7 +47,7 @@ export function Header() {
             href="https://www.skool.com/aifootball"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors hidden sm:inline-block"
           >
             AI Football Skool
           </a>

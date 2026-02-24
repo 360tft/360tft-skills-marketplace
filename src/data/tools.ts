@@ -28,8 +28,6 @@ export interface Tool {
   chatgptUrl?: string;
   isPublished: boolean;
   installCount: number;
-  avgRating: number;
-  reviewCount: number;
   exampleQueries: string[];
   inputParams: { name: string; description: string; required: boolean }[];
   badges: string[];
@@ -65,8 +63,6 @@ export const tools: Tool[] = [
     productUrl: "https://footballgpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.8,
-    reviewCount: 0,
     exampleQueries: [
       "What are good warm-up activities for U10s?",
       "How do I teach a 4-3-3 pressing system?",
@@ -116,8 +112,6 @@ export const tools: Tool[] = [
     productUrl: "https://footballgpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.9,
-    reviewCount: 0,
     exampleQueries: [
       "Create a 60-minute U12 session on 1v1 defending",
       "Plan a warm-up focused on ball mastery for U8s",
@@ -163,8 +157,6 @@ export const tools: Tool[] = [
     productUrl: "https://footballgpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 5.0,
-    reviewCount: 0,
     exampleQueries: [
       "Create a 4v2 rondo with rotation on loss of possession",
       "Animate a corner kick routine with near post run and far post cross",
@@ -209,8 +201,6 @@ export const tools: Tool[] = [
     productUrl: "https://footballgpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.7,
-    reviewCount: 0,
     exampleQueries: [
       "What are Bukayo Saka's stats this season?",
       "Compare Kane and Haaland's goals per 90",
@@ -244,8 +234,6 @@ export const tools: Tool[] = [
     productUrl: "https://footballgpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.5,
-    reviewCount: 0,
     exampleQueries: [
       "Find U12 passing drills",
       "Show me 1v1 defending exercises",
@@ -288,8 +276,6 @@ export const tools: Tool[] = [
     productUrl: "https://refereegpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.9,
-    reviewCount: 0,
     exampleQueries: [
       "Can a goalkeeper pick up a throw-in from their own player?",
       "What is the offside rule for deflections?",
@@ -330,8 +316,6 @@ export const tools: Tool[] = [
     productUrl: "https://refereegpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.8,
-    reviewCount: 0,
     exampleQueries: [
       "A player takes off their shirt after scoring. What's the call?",
       "Defender handles the ball in the penalty area but it was hit from close range",
@@ -367,8 +351,6 @@ export const tools: Tool[] = [
     productUrl: "https://refereegpt.co",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.6,
-    reviewCount: 0,
     exampleQueries: [
       "Quiz me on offside rules, medium difficulty",
       "5 questions on handball law for beginner referees",
@@ -411,8 +393,6 @@ export const tools: Tool[] = [
     productUrl: "https://coachreflection.com",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.7,
-    reviewCount: 0,
     exampleQueries: [
       "Today's session went well. The 1v1 defending activity clicked with the U14s. I kept my instructions short and they responded much better.",
       "Struggled with engagement today. The U10s were distracted. I think the session was too complex for them.",
@@ -461,8 +441,6 @@ export const tools: Tool[] = [
     productUrl: "https://coachreflection.com",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.6,
-    reviewCount: 0,
     exampleQueries: [
       "What patterns do you see in my last 10 reflections?",
       "What are my coaching strengths based on my logs?",
@@ -501,8 +479,6 @@ export const tools: Tool[] = [
     productUrl: "https://coachreflection.com",
     isPublished: true,
     installCount: 0,
-    avgRating: 4.5,
-    reviewCount: 0,
     exampleQueries: [
       "What have I improved on most this season?",
       "When was my best session this month and why?",
@@ -520,131 +496,6 @@ export const tools: Tool[] = [
     installMethods: ["claude_desktop", "web"],
   },
 
-  // ===== Gumroad Content Tools =====
-  {
-    id: "gm-game-model",
-    slug: "game-model-search",
-    name: "360TFT Game Model Search",
-    description:
-      "Search Kevin's 750-page game model for age-appropriate coaching guidance, phase-of-play breakdowns, and development frameworks.",
-    longDescription:
-      "The 360TFT Game Model is a comprehensive 750+ page document covering every aspect of youth football development from U5 to Senior. It includes phase-of-play breakdowns, age-stage development guides, coaching principles, session frameworks, and more.\n\nThis tool lets you search the entire game model using natural language. Ask about any age group, phase of play, or coaching topic and get relevant paragraphs with section references.\n\nFree tier gives you 10 searches per day. The full document is available at 360tft.com.",
-    category: "coaching",
-    iconEmoji: "\uD83D\uDCD5",
-    authorName: "Coach Kevin",
-    authorType: "official",
-    mcpServerPath: "marketplace",
-    mcpToolName: "search_game_model",
-    pricingType: "freemium",
-    gumroadUrl: "https://360tft.gumroad.com/l/360TFTGM",
-    isPublished: true,
-    installCount: 0,
-    avgRating: 4.9,
-    reviewCount: 0,
-    exampleQueries: [
-      "What should U10s focus on in possession?",
-      "How should I develop goalkeepers at U12?",
-      "What are the key principles for defending at U14?",
-      "Transition play for U16 academy players",
-    ],
-    inputParams: [
-      {
-        name: "query",
-        description: "What you want to find in the game model",
-        required: true,
-      },
-      {
-        name: "ageGroup",
-        description: "e.g. U8, U12, U16, Senior",
-        required: false,
-      },
-    ],
-    badges: ["Official", "Popular"],
-    installMethods: ["claude_desktop", "web"],
-  },
-  {
-    id: "gm-sessions",
-    slug: "session-library-search",
-    name: "Session Library Search",
-    description:
-      "Search 328+ training sessions across finishing, 1v1, ball mastery, tactical play, SSGs, and more.",
-    longDescription:
-      "Search across Kevin's complete library of 328+ training sessions spanning seven specialist collections: Finishing & Goalscoring, 1v1 Play, Ball Mastery, Tactical Play, Small-Sided Games, Technical Development, and Match-Based Sessions.\n\nEach search returns session name, age group, topic, and a brief preview. Full sessions are available via the 360TFT store. Perfect for finding the right session when you're planning your week.",
-    category: "coaching",
-    iconEmoji: "\uD83D\uDCDA",
-    authorName: "Coach Kevin",
-    authorType: "official",
-    mcpServerPath: "marketplace",
-    mcpToolName: "search_sessions",
-    pricingType: "freemium",
-    gumroadUrl: "https://360tft.gumroad.com",
-    isPublished: true,
-    installCount: 0,
-    avgRating: 4.8,
-    reviewCount: 0,
-    exampleQueries: [
-      "Find finishing drills for U14",
-      "Ball mastery sessions for U8",
-      "Tactical sessions on pressing",
-      "Small-sided games for defending",
-    ],
-    inputParams: [
-      {
-        name: "query",
-        description: "What kind of session you're looking for",
-        required: true,
-      },
-      {
-        name: "category",
-        description:
-          "finishing, 1v1, ball_mastery, tactical, ssg, technical, match_based",
-        required: false,
-      },
-      {
-        name: "ageGroup",
-        description: "e.g. U8, U12, U16",
-        required: false,
-      },
-    ],
-    badges: ["Official"],
-    installMethods: ["claude_desktop", "web"],
-  },
-  {
-    id: "gm-cheat-sheets",
-    slug: "coaching-guides-search",
-    name: "Free Coaching Guides",
-    description:
-      "Search free coaching cheat sheets and guides: Defending, Technical Exercises, SSGs, UEFA C prep, AI for coaching, and more.",
-    longDescription:
-      "Access Kevin's collection of free coaching guides and cheat sheets covering defending principles, technical exercises, small-sided games, UEFA C preparation, AI for coaching, individual development plans (IDP), and coach reflection frameworks.\n\nThis content is completely free with no rate limits. Every response includes links to related products and communities for coaches who want to go deeper.",
-    category: "content",
-    iconEmoji: "\uD83D\uDCC4",
-    authorName: "Coach Kevin",
-    authorType: "official",
-    mcpServerPath: "marketplace",
-    mcpToolName: "search_coaching_guides",
-    pricingType: "free",
-    gumroadUrl: "https://360tft.gumroad.com",
-    isPublished: true,
-    installCount: 0,
-    avgRating: 4.7,
-    reviewCount: 0,
-    exampleQueries: [
-      "Defending principles cheat sheet",
-      "UEFA C exam preparation guide",
-      "How to use AI in coaching",
-      "Individual development plan template",
-    ],
-    inputParams: [
-      {
-        name: "query",
-        description: "What guide or cheat sheet you're looking for",
-        required: true,
-      },
-    ],
-    badges: ["Official", "Free"],
-    installMethods: ["claude_desktop", "web"],
-  },
 ];
 
 export function getToolBySlug(slug: string): Tool | undefined {

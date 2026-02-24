@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const MCP_GATEWAY_URL =
-  process.env.MCP_GATEWAY_URL || "https://mcp.360tft.com";
+// Product base URLs for direct API calls
+const PRODUCT_URLS: Record<string, string> = {
+  footballgpt: "https://footballgpt.co",
+  refereegpt: "https://refereegpt.co",
+  coachreflect: "https://coachreflection.com",
+};
 
-// Simple in-memory rate limiting (replace with Upstash in production)
+// Map tool names (underscore) to API action paths (hyphenated)
+function toolNameToAction(mcpToolName: string): string {
+  return mcpToolName.replace(/_/g, "-");
+}
+
+// Simple in-memory rate limiting
 const tries = new Map<string, { count: number; resetAt: number }>();
 
 function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
   const now = Date.now();
-  const key = ip;
-  const entry = tries.get(key);
+  const entry = tries.get(ip);
 
   if (!entry || entry.resetAt < now) {
-    tries.set(key, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 });
+    tries.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 });
     return { allowed: true, remaining: 4 };
   }
 
@@ -52,36 +60,47 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Call the MCP gateway
-    const response = await fetch(
-      `${MCP_GATEWAY_URL}/${mcpServerPath}/api/${mcpToolName}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-MCP-Service-Key": process.env.MCP_SERVICE_SECRET || "",
-        },
-        body: JSON.stringify({ query, message: query }),
-      }
-    );
+    const productUrl = PRODUCT_URLS[mcpServerPath];
+    if (!productUrl) {
+      return NextResponse.json(
+        { error: "Unknown product" },
+        { status: 400 }
+      );
+    }
+
+    const action = toolNameToAction(mcpToolName);
+    const apiUrl = `${productUrl}/api/mcp/${action}`;
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-MCP-Service-Key": process.env.MCP_SERVICE_SECRET || "",
+      },
+      body: JSON.stringify({ query, message: query }),
+    });
 
     if (!response.ok) {
-      // If MCP gateway is not available, return a demo response
-      return NextResponse.json({
-        result: `[Demo Mode] This is a preview of the ${mcpToolName} tool. The full MCP gateway integration is being configured. Install this tool to Claude Desktop for the real experience.\n\nYour query: "${query}"`,
-        demo: true,
-      });
+      const errorText = await response.text().catch(() => "");
+      return NextResponse.json(
+        {
+          result: `This tool is temporarily unavailable. Install it to Claude Desktop for the full experience.\n\nError: ${response.status}${errorText ? ` - ${errorText.slice(0, 200)}` : ""}`,
+          demo: true,
+        },
+        { headers: { "X-RateLimit-Remaining": String(remaining) } }
+      );
     }
 
     const data = await response.json();
+    const result = data.text || data.result || data.content || JSON.stringify(data);
+
     return NextResponse.json(
-      { result: data.result || data.content || JSON.stringify(data) },
+      { result },
       { headers: { "X-RateLimit-Remaining": String(remaining) } }
     );
-  } catch {
-    // Fallback demo response when gateway is unavailable
+  } catch (err) {
     return NextResponse.json({
-      result: `[Demo Mode] The MCP gateway is being configured. Install this tool to Claude Desktop for the full experience.`,
+      result: `Connection error. The product API may be temporarily unavailable. Install this tool to Claude Desktop for the full experience.`,
       demo: true,
     });
   }

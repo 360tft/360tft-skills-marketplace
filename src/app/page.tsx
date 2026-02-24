@@ -8,7 +8,7 @@ import { SearchFilter } from "@/components/search-filter";
 import { getPublishedTools } from "@/data/tools";
 import type { ToolCategory } from "@/data/tools";
 
-type SortOption = "popular" | "newest" | "rating";
+type SortOption = "popular" | "newest";
 
 export default function HomePage() {
   const allTools = getPublishedTools();
@@ -38,9 +38,6 @@ export default function HomePage() {
     switch (activeSort) {
       case "popular":
         result = [...result].sort((a, b) => b.installCount - a.installCount);
-        break;
-      case "rating":
-        result = [...result].sort((a, b) => b.avgRating - a.avgRating);
         break;
       case "newest":
         result = [...result].reverse();

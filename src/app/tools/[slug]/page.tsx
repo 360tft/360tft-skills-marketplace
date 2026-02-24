@@ -129,9 +129,20 @@ function InstallModal({
     2
   );
 
-  const handleSubmitEmail = (e: React.FormEvent) => {
+  const handleSubmitEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+
+    // Store email in Supabase (non-blocking on failure)
+    fetch("/api/email-capture", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email.trim(),
+        sourceTool: tool.slug,
+      }),
+    }).catch(() => {});
+
     setSubmitted(true);
   };
 
