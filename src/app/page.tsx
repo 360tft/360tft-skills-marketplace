@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ToolCard } from "@/components/tool-card";
@@ -9,6 +10,56 @@ import { getPublishedTools } from "@/data/tools";
 import type { ToolCategory } from "@/data/tools";
 
 type SortOption = "popular" | "newest";
+
+const faqItems = [
+  {
+    question: "What is AI Football?",
+    answer:
+      "AI Football is the first AI agent marketplace for football. It provides MCP tools, APIs, and AI agents for coaching, refereeing, scouting, and club management. All tools are free to try on the web.",
+  },
+  {
+    question: "What is an MCP?",
+    answer:
+      "MCP (Model Context Protocol) is an open standard that lets AI assistants like Claude discover and use external tools. When you add an MCP server, your AI assistant gains new capabilities — in this case, football coaching expertise.",
+  },
+  {
+    question: "Can I use these tools in OpenClaw?",
+    answer:
+      "Yes. All AI Football tools are available as MCP skills that work with OpenClaw agents. Visit the OpenClaw page for setup instructions.",
+  },
+  {
+    question: "Are these tools free?",
+    answer:
+      "Every tool has a free tier. You get 5 free tries per day on the web and 10 API calls per day with a free API key. For more usage, subscribe to the individual products (FootballGPT, RefereeGPT, or CoachReflect).",
+  },
+  {
+    question: "Can I list my own tool?",
+    answer:
+      "Yes. If you have built a football AI tool, you can submit it for listing on the marketplace. Visit the Submit page to get started. Listings are free.",
+  },
+];
+
+function FaqJsonLd() {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+    />
+  );
+}
 
 export default function HomePage() {
   const allTools = getPublishedTools();
@@ -49,6 +100,7 @@ export default function HomePage() {
 
   return (
     <>
+      <FaqJsonLd />
       <Header />
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Hero */}
@@ -75,6 +127,68 @@ export default function HomePage() {
               Built by AI Football
             </div>
           </div>
+        </div>
+
+        {/* How It Works */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent)]/15 flex items-center justify-center mx-auto mb-3">
+              <span className="text-[var(--accent)] font-bold">1</span>
+            </div>
+            <h3 className="font-medium text-[var(--foreground)] mb-1">
+              Browse
+            </h3>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Find AI tools for coaching, refereeing, scouting, and more
+            </p>
+          </div>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent)]/15 flex items-center justify-center mx-auto mb-3">
+              <span className="text-[var(--accent)] font-bold">2</span>
+            </div>
+            <h3 className="font-medium text-[var(--foreground)] mb-1">
+              Install
+            </h3>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Add to Claude Desktop, OpenClaw, or ChatGPT in 2 minutes
+            </p>
+          </div>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center">
+            <div className="w-10 h-10 rounded-full bg-[var(--accent)]/15 flex items-center justify-center mx-auto mb-3">
+              <span className="text-[var(--accent)] font-bold">3</span>
+            </div>
+            <h3 className="font-medium text-[var(--foreground)] mb-1">
+              Use
+            </h3>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              Ask your AI assistant football questions, get expert answers
+            </p>
+          </div>
+        </div>
+
+        {/* Platform badges */}
+        <div className="flex items-center justify-center gap-3 mb-10 flex-wrap">
+          <Link
+            href="/docs/claude-desktop"
+            className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--accent)]/50 transition-colors"
+          >
+            Claude Desktop
+          </Link>
+          <Link
+            href="/openclaw"
+            className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--accent)]/50 transition-colors"
+          >
+            OpenClaw
+          </Link>
+          <Link
+            href="/docs/chatgpt"
+            className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--accent)]/50 transition-colors"
+          >
+            ChatGPT
+          </Link>
+          <span className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--muted-foreground)]">
+            Web (try here)
+          </span>
         </div>
 
         {/* Search and filters */}
@@ -111,6 +225,81 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* Get Started */}
+        <div className="mt-16 bg-[var(--card)] border border-[var(--border)] rounded-xl p-8">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4 text-center">
+            Get started
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/docs/claude-desktop"
+              className="group bg-[var(--background)] border border-[var(--border)] rounded-lg p-4 hover:border-[var(--accent)]/50 transition-colors"
+            >
+              <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors mb-1">
+                Claude Desktop
+              </p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Add MCP config and restart. 2 min setup.
+              </p>
+            </Link>
+            <Link
+              href="/openclaw"
+              className="group bg-[var(--background)] border border-[var(--border)] rounded-lg p-4 hover:border-[var(--accent)]/50 transition-colors"
+            >
+              <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors mb-1">
+                OpenClaw
+              </p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Install football skills into your agent.
+              </p>
+            </Link>
+            <Link
+              href="/docs/chatgpt"
+              className="group bg-[var(--background)] border border-[var(--border)] rounded-lg p-4 hover:border-[var(--accent)]/50 transition-colors"
+            >
+              <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors mb-1">
+                ChatGPT
+              </p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Open a Custom GPT. No setup needed.
+              </p>
+            </Link>
+            <Link
+              href="/tools/coaching-advice"
+              className="group bg-[var(--background)] border border-[var(--border)] rounded-lg p-4 hover:border-[var(--accent)]/50 transition-colors"
+            >
+              <p className="text-sm font-medium text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors mb-1">
+                Try on the web
+              </p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                5 free tries per tool, per day.
+              </p>
+            </Link>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className="mt-16">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4 text-center">
+            Frequently asked questions
+          </h2>
+          <div className="max-w-2xl mx-auto space-y-4">
+            {faqItems.map((item) => (
+              <div
+                key={item.question}
+                className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5"
+              >
+                <h3 className="font-medium text-[var(--foreground)] mb-2">
+                  {item.question}
+                </h3>
+                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+                  {item.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom CTA */}
         <div className="mt-16 text-center bg-[var(--card)] border border-[var(--border)] rounded-xl p-8">
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-2">
@@ -121,7 +310,7 @@ export default function HomePage() {
             keys to all products, and publish your own tools on this
             marketplace.
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <a
               href="https://www.skool.com/aifootball"
               target="_blank"
@@ -130,12 +319,18 @@ export default function HomePage() {
             >
               Join AI Football Skool (Free)
             </a>
-            <a
+            <Link
+              href="/submit"
+              className="text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              List Your Tool
+            </Link>
+            <Link
               href="/developer"
               className="text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
             >
               Developer Portal
-            </a>
+            </Link>
           </div>
         </div>
       </main>

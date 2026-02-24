@@ -26,6 +26,12 @@ export function Header() {
             Browse
           </Link>
           <Link
+            href="/agents"
+            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors hidden sm:inline"
+          >
+            Agents
+          </Link>
+          <Link
             href="/docs"
             className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
           >
@@ -33,7 +39,7 @@ export function Header() {
           </Link>
           <Link
             href="/learn"
-            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors hidden sm:inline"
           >
             Learn
           </Link>
@@ -42,6 +48,12 @@ export function Header() {
             className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors hidden sm:inline"
           >
             Developers
+          </Link>
+          <Link
+            href="/submit"
+            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors hidden sm:inline"
+          >
+            Submit
           </Link>
           <a
             href="https://www.skool.com/aifootball"

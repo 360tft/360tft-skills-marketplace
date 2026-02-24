@@ -5,6 +5,19 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { getPublishedTools } from "@/data/tools";
 
+interface Submission {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  mcp_url: string | null;
+  api_docs_url: string | null;
+  email: string;
+  status: string;
+  admin_notes: string | null;
+  created_at: string;
+}
+
 interface Stats {
   configured: boolean;
   message?: string;
@@ -158,6 +171,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissionsFilter, setSubmissionsFilter] = useState("pending");
+  const [updatingSubmission, setUpdatingSubmission] = useState<string | null>(null);
 
   const allTools = getPublishedTools();
 
@@ -204,11 +220,48 @@ export default function AdminPage() {
     }
   }, [secret, keysPage, keySearch]);
 
+  const fetchSubmissions = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `/api/admin/submissions?status=${submissionsFilter}`,
+        { headers: { "x-admin-secret": secret } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setSubmissions(data.submissions || []);
+      }
+    } catch {
+      // Silent fail
+    }
+  }, [secret, submissionsFilter]);
+
+  const updateSubmission = async (id: string, status: string) => {
+    setUpdatingSubmission(id);
+    try {
+      const res = await fetch("/api/admin/submissions", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-secret": secret,
+        },
+        body: JSON.stringify({ id, status }),
+      });
+      if (res.ok) {
+        await fetchSubmissions();
+      }
+    } catch {
+      // Silent fail
+    } finally {
+      setUpdatingSubmission(null);
+    }
+  };
+
   useEffect(() => {
     if (authenticated) {
       fetchKeys();
+      fetchSubmissions();
     }
-  }, [authenticated, fetchKeys]);
+  }, [authenticated, fetchKeys, fetchSubmissions]);
 
   const updateKey = async (
     keyId: string,
@@ -696,6 +749,101 @@ export default function AdminPage() {
             </div>
           </>
         )}
+
+        {/* Tool Submissions */}
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">
+            Tool Submissions
+          </h2>
+          <div className="flex gap-2">
+            {["pending", "approved", "rejected"].map((s) => (
+              <button
+                key={s}
+                onClick={() => setSubmissionsFilter(s)}
+                className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${
+                  submissionsFilter === s
+                    ? "border-[var(--accent)] text-[var(--accent)]"
+                    : "border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden mb-8">
+          {submissions.length === 0 ? (
+            <p className="px-4 py-8 text-center text-[var(--muted)]">
+              No {submissionsFilter} submissions
+            </p>
+          ) : (
+            <div className="divide-y divide-[var(--border)]">
+              {submissions.map((sub) => (
+                <div key={sub.id} className="p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-[var(--foreground)]">
+                        {sub.name}
+                      </p>
+                      <p className="text-sm text-[var(--muted-foreground)] mt-0.5">
+                        {sub.description}
+                      </p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-[var(--muted)]">
+                        <span>{sub.category}</span>
+                        <span>{sub.email}</span>
+                        {sub.mcp_url && (
+                          <a
+                            href={sub.mcp_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[var(--accent)] hover:underline"
+                          >
+                            MCP URL
+                          </a>
+                        )}
+                        {sub.api_docs_url && (
+                          <a
+                            href={sub.api_docs_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[var(--accent)] hover:underline"
+                          >
+                            Docs
+                          </a>
+                        )}
+                        <span>
+                          {new Date(sub.created_at).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    {sub.status === "pending" && (
+                      <div className="flex gap-2 shrink-0">
+                        <button
+                          onClick={() => updateSubmission(sub.id, "approved")}
+                          disabled={updatingSubmission === sub.id}
+                          className="text-xs px-2.5 py-1 rounded bg-green-900/20 text-green-400 hover:bg-green-900/40 transition-colors disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => updateSubmission(sub.id, "rejected")}
+                          disabled={updatingSubmission === sub.id}
+                          className="text-xs px-2.5 py-1 rounded bg-red-900/20 text-red-400 hover:bg-red-900/40 transition-colors disabled:opacity-50"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Custom GPT Status */}
         <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3">

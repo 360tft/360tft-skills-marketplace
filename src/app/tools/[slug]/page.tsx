@@ -8,6 +8,74 @@ import { ToolCard } from "@/components/tool-card";
 import { getToolBySlug, getRelatedTools } from "@/data/tools";
 import type { Tool } from "@/data/tools";
 
+function ToolJsonLd({ tool }: { tool: Tool }) {
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://aifootball.co";
+
+  const softwareApp = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: tool.name,
+    description: tool.description,
+    applicationCategory: "AI Tool",
+    operatingSystem: "Web, Claude Desktop, ChatGPT",
+    url: `${baseUrl}/tools/${tool.slug}`,
+    author: {
+      "@type": "Person",
+      name: tool.authorName,
+    },
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      description:
+        tool.pricingType === "free"
+          ? "Free"
+          : "Free tier available, Pro features with subscription",
+    },
+  };
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: baseUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: categoryLabels[tool.category] || tool.category,
+        item: `${baseUrl}/?category=${tool.category}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: tool.name,
+        item: `${baseUrl}/tools/${tool.slug}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApp) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+      />
+    </>
+  );
+}
+
 function TryItDemo({ tool }: { tool: Tool }) {
   const [query, setQuery] = useState("");
   const [response, setResponse] = useState("");
@@ -277,17 +345,18 @@ export default function ToolDetailPage({
 
   return (
     <>
+      <ToolJsonLd tool={tool} />
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-[var(--muted)] mb-6">
           <Link href="/" className="hover:text-[var(--foreground)] transition-colors">
-            Skills
+            Home
           </Link>
           <span>/</span>
-          <span className="text-[var(--muted-foreground)]">
+          <Link href="/" className="hover:text-[var(--foreground)] transition-colors">
             {categoryLabels[tool.category]}
-          </span>
+          </Link>
           <span>/</span>
           <span className="text-[var(--foreground)]">{tool.name}</span>
         </nav>
