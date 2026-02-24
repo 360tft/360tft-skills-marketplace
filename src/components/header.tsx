@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthButton } from "./auth-button";
 
 export function Header() {
   return (
@@ -55,14 +56,7 @@ export function Header() {
           >
             Submit
           </Link>
-          <a
-            href="https://www.skool.com/aifootball"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors hidden sm:inline-block"
-          >
-            AI Football Skool
-          </a>
+          <AuthButton />
         </nav>
       </div>
     </header>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, stored: false });
     }
 
-    // Increment install count for the tool if provided (non-critical)
+    // Log install activity + increment count (non-critical)
     if (sourceTool) {
       try {
         await supabase.rpc("increment_install_count", {
@@ -39,6 +39,16 @@ export async function POST(req: NextRequest) {
         });
       } catch {
         // Non-critical, don't block
+      }
+
+      try {
+        await supabase.from("user_activity").insert({
+          tool_slug: sourceTool,
+          action: "install",
+          metadata: { email: email.toLowerCase().trim() },
+        });
+      } catch {
+        // Non-critical
       }
     }
 

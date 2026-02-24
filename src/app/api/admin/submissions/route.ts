@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { sendToolApprovedEmail, sendToolRejectedEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,13 @@ export async function PATCH(req: NextRequest) {
       updates.admin_notes = adminNotes;
     }
 
+    // Fetch submission details for email
+    const { data: submission } = await db
+      .from("tool_submissions")
+      .select("email, name")
+      .eq("id", id)
+      .single();
+
     const { error } = await db
       .from("tool_submissions")
       .update(updates)
@@ -85,6 +93,22 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Send notification email (non-blocking)
+    if (submission?.email && submission?.name) {
+      if (status === "approved") {
+        sendToolApprovedEmail(submission.email, submission.name).catch(() => {});
+        // Promote user to creator role
+        if (submission.email) {
+          db.from("profiles")
+            .update({ role: "creator", updated_at: new Date().toISOString() })
+            .eq("email", submission.email)
+            .then(() => {});
+        }
+      } else if (status === "rejected") {
+        sendToolRejectedEmail(submission.email, submission.name).catch(() => {});
+      }
     }
 
     return NextResponse.json({ success: true });

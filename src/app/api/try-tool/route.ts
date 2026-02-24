@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { createServerClient } from "@supabase/ssr";
+import crypto from "crypto";
+import { extractTopics } from "@/lib/query-analysis";
 
 // Product base URLs for direct API calls
 const PRODUCT_URLS: Record<string, string> = {
@@ -47,6 +51,55 @@ function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
 
   entry.count++;
   return { allowed: true, remaining: 5 - entry.count };
+}
+
+async function logActivity(
+  req: NextRequest,
+  toolSlug: string,
+  queryText: string
+) {
+  try {
+    const db = getSupabaseAdmin();
+    if (!db) return;
+
+    let userId: string | null = null;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseAnonKey) {
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll() {},
+        },
+      });
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      userId = user?.id ?? null;
+    }
+
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    const anonymousId = userId
+      ? null
+      : crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
+
+    const topics = extractTopics(queryText);
+
+    await db.from("user_activity").insert({
+      user_id: userId,
+      anonymous_id: anonymousId,
+      tool_slug: toolSlug,
+      action: "try",
+      query_text: queryText,
+      metadata: topics.length > 0 ? { topics } : {},
+    });
+  } catch {
+    // Non-critical, don't block
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -110,6 +163,9 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     const result = data.text || data.result || data.content || JSON.stringify(data);
+
+    // Log activity (non-blocking)
+    logActivity(req, action, query).catch(() => {});
 
     return NextResponse.json(
       { result },

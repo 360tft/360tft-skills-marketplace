@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 interface ApiKeyData {
   id: string;
@@ -16,9 +18,7 @@ interface ApiKeyData {
   created_at: string;
 }
 
-function KeyManagement() {
-  const [email, setEmail] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
+function KeyManagement({ user }: { user: User }) {
   const [keys, setKeys] = useState<ApiKeyData[]>([]);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyProduct, setNewKeyProduct] = useState("all");
@@ -27,36 +27,31 @@ function KeyManagement() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const loadKeys = useCallback(
-    async (emailAddr: string) => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(
-          `/api/keys?email=${encodeURIComponent(emailAddr)}`
-        );
-        const data = await res.json();
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setKeys(data.keys || []);
-          setAuthenticated(true);
-        }
-      } catch {
-        setError("Failed to load keys. Database may not be configured yet.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const email = user.email!;
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      loadKeys(email.trim().toLowerCase());
+  const loadKeys = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(
+        `/api/keys?email=${encodeURIComponent(email)}`
+      );
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setKeys(data.keys || []);
+      }
+    } catch {
+      setError("Failed to load keys. Database may not be configured yet.");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [email]);
+
+  useEffect(() => {
+    loadKeys();
+  }, [loadKeys]);
 
   const handleCreateKey = async () => {
     setLoading(true);
@@ -78,7 +73,7 @@ function KeyManagement() {
       } else {
         setNewKeySecret(data.key);
         setNewKeyName("");
-        loadKeys(email);
+        loadKeys();
       }
     } catch {
       setError("Failed to create key");
@@ -101,7 +96,7 @@ function KeyManagement() {
       if (data.error) {
         setError(data.error);
       } else {
-        loadKeys(email);
+        loadKeys();
       }
     } catch {
       setError("Failed to revoke key");
@@ -113,39 +108,6 @@ function KeyManagement() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  if (!authenticated) {
-    return (
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-[var(--foreground)] mb-2">
-          Your API Keys
-        </h2>
-        <p className="text-sm text-[var(--muted-foreground)] mb-4">
-          Enter your email to manage your API keys. New here? Enter any email to create your first key.
-        </p>
-        <form onSubmit={handleLogin} className="flex gap-2">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]/50"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 rounded-lg bg-[var(--accent)] text-black text-sm font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
-          >
-            {loading ? "Loading..." : "Continue"}
-          </button>
-        </form>
-        {error && (
-          <p className="text-sm text-red-400 mt-2">{error}</p>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -173,16 +135,19 @@ function KeyManagement() {
             onClick={() => setNewKeySecret("")}
             className="mt-3 text-xs text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
           >
-            I've saved it, dismiss this
+            I&apos;ve saved it, dismiss this
           </button>
         </div>
       )}
 
       {/* Create new key */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
-        <h2 className="font-semibold text-[var(--foreground)] mb-3">
-          Create New Key
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-[var(--foreground)]">
+            Create New Key
+          </h2>
+          <span className="text-xs text-[var(--muted)]">{email}</span>
+        </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
@@ -217,18 +182,15 @@ function KeyManagement() {
 
       {/* Key list */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-[var(--foreground)]">
-            Your Keys
-          </h2>
-          <span className="text-xs text-[var(--muted)]">
-            {email}
-          </span>
-        </div>
+        <h2 className="font-semibold text-[var(--foreground)] mb-4">
+          Your Keys
+        </h2>
 
         {keys.length === 0 ? (
           <p className="text-sm text-[var(--muted-foreground)]">
-            No keys yet. Create one above to get started.
+            {loading
+              ? "Loading keys..."
+              : "No keys yet. Create one above to get started."}
           </p>
         ) : (
           <div className="space-y-3">
@@ -283,6 +245,29 @@ function KeyManagement() {
 }
 
 export default function DeveloperPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <p className="text-[var(--muted)]">Loading...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
@@ -298,7 +283,15 @@ export default function DeveloperPage() {
 
         {/* Key management section */}
         <div className="mb-10">
-          <KeyManagement />
+          {user ? (
+            <KeyManagement user={user} />
+          ) : (
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-center">
+              <p className="text-sm text-[var(--muted-foreground)]">
+                Sign in to manage your API keys.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* What you get */}

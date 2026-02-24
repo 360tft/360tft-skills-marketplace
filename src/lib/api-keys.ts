@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { getSupabaseAdmin, isSupabaseConfigured } from "./supabase";
+import { getSupabaseAdmin, isSupabaseConfigured } from "./supabase/admin";
 
 // Key prefixes per product
 const PRODUCT_PREFIXES: Record<string, string> = {

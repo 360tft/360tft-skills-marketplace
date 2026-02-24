@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
 
   const db = getSupabaseAdmin()!;
   const today = new Date().toISOString().split("T")[0];
-  const thisMonth = new Date().toISOString().slice(0, 7);
 
   try {
     // Total keys
@@ -111,6 +110,86 @@ export async function GET(req: NextRequest) {
       dailyTotals[row.date] = (dailyTotals[row.date] || 0) + row.call_count;
     }
 
+    // --- Enhanced analytics (Phase 4) ---
+
+    // Total registered users
+    const { count: totalUsers } = await db
+      .from("profiles")
+      .select("id", { count: "exact", head: true });
+
+    // Users registered this week
+    const { count: usersThisWeek } = await db
+      .from("profiles")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", sevenDaysAgo.toISOString());
+
+    // Active users this week (unique user_ids in user_activity)
+    const { data: weeklyActiveData } = await db
+      .from("user_activity")
+      .select("user_id")
+      .not("user_id", "is", null)
+      .gte("created_at", sevenDaysAgo.toISOString());
+    const weeklyActiveUsers = new Set(
+      (weeklyActiveData || []).map((r) => r.user_id).filter(Boolean)
+    ).size;
+
+    // Active today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { data: dailyActiveData } = await db
+      .from("user_activity")
+      .select("user_id")
+      .not("user_id", "is", null)
+      .gte("created_at", todayStart.toISOString());
+    const dailyActiveUsers = new Set(
+      (dailyActiveData || []).map((r) => r.user_id).filter(Boolean)
+    ).size;
+
+    // Top 20 queries this week
+    const { data: topQueriesData } = await db
+      .from("user_activity")
+      .select("query_text")
+      .eq("action", "try")
+      .not("query_text", "is", null)
+      .gte("created_at", sevenDaysAgo.toISOString())
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    const queryCounts: Record<string, number> = {};
+    for (const row of topQueriesData || []) {
+      if (row.query_text) {
+        const q = row.query_text.toLowerCase().trim();
+        queryCounts[q] = (queryCounts[q] || 0) + 1;
+      }
+    }
+    const topQueries = Object.entries(queryCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 20)
+      .map(([query, count]) => ({ query, count }));
+
+    // Tool popularity by tries this week
+    const { data: toolPopData } = await db
+      .from("user_activity")
+      .select("tool_slug")
+      .eq("action", "try")
+      .gte("created_at", sevenDaysAgo.toISOString());
+
+    const toolPopCounts: Record<string, number> = {};
+    for (const row of toolPopData || []) {
+      toolPopCounts[row.tool_slug] =
+        (toolPopCounts[row.tool_slug] || 0) + 1;
+    }
+    const toolPopularity = Object.entries(toolPopCounts)
+      .sort(([, a], [, b]) => b - a)
+      .map(([slug, count]) => ({ slug, tries: count }));
+
+    // New signups (last 10)
+    const { data: recentSignups } = await db
+      .from("profiles")
+      .select("email, display_name, role, created_at")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
     return NextResponse.json({
       configured: true,
       overview: {
@@ -118,12 +197,19 @@ export async function GET(req: NextRequest) {
         activeKeys: activeKeys || 0,
         uniqueDevelopers: uniqueEmails.size,
         callsToday,
+        totalUsers: totalUsers || 0,
+        usersThisWeek: usersThisWeek || 0,
+        dailyActiveUsers,
+        weeklyActiveUsers,
       },
       tierBreakdown: tierCounts,
       productBreakdown: productCounts,
       topToolsToday: toolTotals,
       dailyUsage: dailyTotals,
       recentKeys: recentKeys || [],
+      topQueries,
+      toolPopularity,
+      recentSignups: recentSignups || [],
     });
   } catch (error) {
     return NextResponse.json(

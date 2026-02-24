@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createApiKey, listApiKeys } from "@/lib/api-keys";
+import { sendApiKeyCreatedEmail } from "@/lib/email";
 
 /**
  * POST /api/keys — Create a new API key
@@ -26,6 +27,13 @@ export async function POST(req: NextRequest) {
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
+
+    // Send email notification (non-blocking)
+    sendApiKeyCreatedEmail(
+      email.toLowerCase().trim(),
+      result.key_prefix,
+      product || "all"
+    ).catch(() => {});
 
     return NextResponse.json({
       id: result.id,

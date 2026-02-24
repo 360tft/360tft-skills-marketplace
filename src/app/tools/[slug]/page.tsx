@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -306,6 +306,69 @@ function InstallModal({
   );
 }
 
+function FavouriteButton({ toolSlug }: { toolSlug: string }) {
+  const [isFav, setIsFav] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/favourites")
+      .then((res) => (res.ok ? res.json() : { favourites: [] }))
+      .then((data) => {
+        const found = (data.favourites || []).some(
+          (f: { tool_slug: string }) => f.tool_slug === toolSlug
+        );
+        setIsFav(found);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [toolSlug]);
+
+  const toggle = async () => {
+    const method = isFav ? "DELETE" : "POST";
+    const res = await fetch("/api/favourites", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ toolSlug }),
+    });
+
+    if (res.status === 401) {
+      window.location.href = `/auth/login?redirectTo=/tools/${toolSlug}`;
+      return;
+    }
+
+    if (res.ok) setIsFav(!isFav);
+  };
+
+  if (loading) return null;
+
+  return (
+    <button
+      onClick={toggle}
+      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm transition-colors ${
+        isFav
+          ? "border-[var(--accent)]/50 bg-[var(--accent)]/10 text-[var(--accent)]"
+          : "border-[var(--border)] text-[var(--muted-foreground)] hover:bg-white/5"
+      }`}
+      title={isFav ? "Remove from favourites" : "Add to favourites"}
+    >
+      <svg
+        className="w-4 h-4"
+        fill={isFav ? "currentColor" : "none"}
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+        />
+      </svg>
+      {isFav ? "Saved" : "Save"}
+    </button>
+  );
+}
+
 const categoryLabels: Record<string, string> = {
   coaching: "Coaching",
   refereeing: "Refereeing",
@@ -441,6 +504,7 @@ export default function ToolDetailPage({
               Get on AI Football Store
             </a>
           )}
+          <FavouriteButton toolSlug={tool.slug} />
         </div>
 
         {/* Description */}

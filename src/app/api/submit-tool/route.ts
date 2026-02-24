@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { notifyToolSubmission } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Notify admin (non-blocking)
+    notifyToolSubmission(email.toLowerCase().trim(), name.trim()).catch(() => {});
 
     return NextResponse.json({ success: true, stored: true });
   } catch {
