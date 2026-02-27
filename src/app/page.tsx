@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ToolCard } from "@/components/tool-card";
 import { SearchFilter } from "@/components/search-filter";
+import { SponsoredHero } from "@/components/sponsored-hero";
 import { getPublishedTools } from "@/data/tools";
-import type { ToolCategory } from "@/data/tools";
+import type { Tool, ToolCategory } from "@/data/tools";
 
 type SortOption = "popular" | "newest" | "rated";
 
@@ -68,6 +69,14 @@ export default function HomePage() {
     "all"
   );
   const [activeSort, setActiveSort] = useState<SortOption>("popular");
+  const [gridPromoted, setGridPromoted] = useState<Tool[]>([]);
+
+  useEffect(() => {
+    fetch("/api/sponsorship/active")
+      .then((res) => (res.ok ? res.json() : { grid: [] }))
+      .then((data) => setGridPromoted(data.grid || []))
+      .catch(() => {});
+  }, []);
 
   const filteredTools = useMemo(() => {
     let result = allTools;
@@ -196,6 +205,9 @@ export default function HomePage() {
           </span>
         </div>
 
+        {/* Sponsored hero banner */}
+        <SponsoredHero />
+
         {/* Search and filters */}
         <SearchFilter
           onSearch={setSearchQuery}
@@ -209,9 +221,29 @@ export default function HomePage() {
         {/* Tool grid */}
         {filteredTools.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            {filteredTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} />
-            ))}
+            {/* Show sponsored grid tools at the top when no filters active */}
+            {!searchQuery.trim() &&
+              activeCategory === "all" &&
+              gridPromoted
+                .filter(
+                  (gp) => !filteredTools.some((ft) => ft.slug === gp.slug)
+                )
+                .map((tool) => (
+                  <ToolCard key={`sp-${tool.id}`} tool={tool} isSponsored />
+                ))}
+            {filteredTools.map((tool) => {
+              const isSponsored =
+                !searchQuery.trim() &&
+                activeCategory === "all" &&
+                gridPromoted.some((gp) => gp.slug === tool.slug);
+              return (
+                <ToolCard
+                  key={tool.id}
+                  tool={tool}
+                  isSponsored={isSponsored}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16">

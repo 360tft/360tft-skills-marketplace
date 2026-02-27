@@ -335,6 +335,88 @@ export async function notifyNewSignup(email: string) {
   );
 }
 
+const TIER_LABELS: Record<string, { label: string; price: string }> = {
+  hero: { label: "Hero Banner", price: "$99/month" },
+  grid: { label: "Grid Promoted", price: "$49/month" },
+  detail: { label: "Detail Page", price: "$29/month" },
+};
+
+export async function sendSponsorshipConfirmation(
+  email: string,
+  toolSlug: string,
+  tier: string
+) {
+  const tierInfo = TIER_LABELS[tier] || {
+    label: tier,
+    price: "",
+  };
+  const toolName = toolSlug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  await send(
+    email,
+    `Your ${tierInfo.label} sponsorship is live`,
+    `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #fff;">Sponsorship active</h2>
+      <p style="color: #aaa; line-height: 1.6;">
+        <strong style="color: #fff;">${toolName}</strong> is now promoted with a <strong style="color: #f59e0b;">${tierInfo.label}</strong> placement (${tierInfo.price}).
+      </p>
+      <p style="color: #aaa; line-height: 1.6;">
+        Your tool will appear in the sponsored placement immediately. You can manage your subscription from Stripe.
+      </p>
+      <p style="margin-top: 24px;">
+        <a href="https://aifootball.co/dashboard/creator" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          View your dashboard
+        </a>
+      </p>
+      <p style="color: #666; font-size: 12px; margin-top: 32px;">
+        AI Football — The AI agent marketplace for football
+      </p>
+    </div>
+    `
+  );
+}
+
+export async function sendSponsorshipCancelled(
+  email: string,
+  toolSlug: string,
+  tier: string
+) {
+  const tierInfo = TIER_LABELS[tier] || {
+    label: tier,
+    price: "",
+  };
+  const toolName = toolSlug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+
+  await send(
+    email,
+    `Your ${tierInfo.label} sponsorship has ended`,
+    `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #fff;">Sponsorship ended</h2>
+      <p style="color: #aaa; line-height: 1.6;">
+        The <strong style="color: #f59e0b;">${tierInfo.label}</strong> sponsorship for <strong style="color: #fff;">${toolName}</strong> has been cancelled.
+      </p>
+      <p style="color: #aaa; line-height: 1.6;">
+        Your tool will no longer appear in sponsored placements. You can reactivate at any time from your creator dashboard.
+      </p>
+      <p style="margin-top: 24px;">
+        <a href="https://aifootball.co/dashboard/creator" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Reactivate sponsorship
+        </a>
+      </p>
+      <p style="color: #666; font-size: 12px; margin-top: 32px;">
+        AI Football — The AI agent marketplace for football
+      </p>
+    </div>
+    `
+  );
+}
+
 export async function notifyToolSubmission(email: string, toolName: string) {
   await send(
     getAdminEmail(),

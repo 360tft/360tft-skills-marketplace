@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ToolCard } from "@/components/tool-card";
+import { SponsoredAlternatives } from "@/components/sponsored-alternatives";
 import { getToolBySlug, getRelatedTools } from "@/data/tools";
 import type { Tool } from "@/data/tools";
 
@@ -825,6 +826,9 @@ export default function ToolDetailPage({
         <div className="mb-8">
           <ReviewSection toolSlug={tool.slug} />
         </div>
+
+        {/* Sponsored alternatives */}
+        <SponsoredAlternatives toolSlug={tool.slug} />
 
         {/* Parameters */}
         {tool.inputParams.length > 0 && (

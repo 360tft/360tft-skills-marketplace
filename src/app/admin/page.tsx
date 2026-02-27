@@ -174,6 +174,16 @@ export default function AdminPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [submissionsFilter, setSubmissionsFilter] = useState("pending");
   const [updatingSubmission, setUpdatingSubmission] = useState<string | null>(null);
+  const [sponsoredListings, setSponsoredListings] = useState<
+    {
+      id: string;
+      tool_slug: string;
+      tier: string;
+      status: string;
+      starts_at: string;
+      stripe_subscription_id: string | null;
+    }[]
+  >([]);
 
   const allTools = getPublishedTools();
 
@@ -235,6 +245,20 @@ export default function AdminPage() {
     }
   }, [secret, submissionsFilter]);
 
+  const fetchSponsoredListings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/sponsorships", {
+        headers: { "x-admin-secret": secret },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSponsoredListings(data.listings || []);
+      }
+    } catch {
+      // Silent fail
+    }
+  }, [secret]);
+
   const updateSubmission = async (id: string, status: string) => {
     setUpdatingSubmission(id);
     try {
@@ -260,8 +284,9 @@ export default function AdminPage() {
     if (authenticated) {
       fetchKeys();
       fetchSubmissions();
+      fetchSponsoredListings();
     }
-  }, [authenticated, fetchKeys, fetchSubmissions]);
+  }, [authenticated, fetchKeys, fetchSubmissions, fetchSponsoredListings]);
 
   const updateKey = async (
     keyId: string,
@@ -549,6 +574,109 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Sponsored Listings */}
+        <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3">
+          Sponsored Listings ({sponsoredListings.length})
+        </h2>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden mb-8">
+          {sponsoredListings.length === 0 ? (
+            <p className="px-4 py-8 text-center text-[var(--muted)]">
+              No sponsorships yet
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--border)] text-left">
+                    <th className="px-4 py-2.5 text-xs text-[var(--muted)] font-medium">
+                      Tool
+                    </th>
+                    <th className="px-4 py-2.5 text-xs text-[var(--muted)] font-medium">
+                      Tier
+                    </th>
+                    <th className="px-4 py-2.5 text-xs text-[var(--muted)] font-medium">
+                      Status
+                    </th>
+                    <th className="px-4 py-2.5 text-xs text-[var(--muted)] font-medium">
+                      Start Date
+                    </th>
+                    <th className="px-4 py-2.5 text-xs text-[var(--muted)] font-medium">
+                      Stripe
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sponsoredListings.map((listing) => (
+                    <tr
+                      key={listing.id}
+                      className="border-b border-[var(--border)] last:border-b-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="px-4 py-2 text-[var(--foreground)]">
+                        {listing.tool_slug
+                          .replace(/-/g, " ")
+                          .replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                      </td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={`text-xs px-1.5 py-0.5 rounded ${
+                            listing.tier === "hero"
+                              ? "bg-amber-900/30 text-amber-400"
+                              : listing.tier === "grid"
+                                ? "bg-blue-900/30 text-blue-400"
+                                : "bg-purple-900/30 text-purple-400"
+                          }`}
+                        >
+                          {listing.tier}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={`inline-block w-2 h-2 rounded-full mr-1.5 ${
+                            listing.status === "active"
+                              ? "bg-[var(--success)]"
+                              : listing.status === "past_due"
+                                ? "bg-yellow-400"
+                                : "bg-[var(--destructive)]"
+                          }`}
+                        />
+                        <span className="text-xs text-[var(--muted-foreground)]">
+                          {listing.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-xs text-[var(--muted)]">
+                        {new Date(listing.starts_at).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        {listing.stripe_subscription_id ? (
+                          <a
+                            href={`https://dashboard.stripe.com/subscriptions/${listing.stripe_subscription_id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-[var(--accent)] hover:underline"
+                          >
+                            View
+                          </a>
+                        ) : (
+                          <span className="text-xs text-[var(--muted)]">
+                            —
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* API Keys Management */}

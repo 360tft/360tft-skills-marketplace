@@ -16,6 +16,15 @@ interface Submission {
   created_at: string;
 }
 
+interface Sponsorship {
+  id: string;
+  tool_slug: string;
+  tier: string;
+  status: string;
+  starts_at: string;
+  expires_at: string | null;
+}
+
 interface ToolStats {
   tool_slug: string;
   views: number;
@@ -35,6 +44,9 @@ export default function CreatorDashboardPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [toolStats, setToolStats] = useState<ToolStats[]>([]);
   const [recentQueries, setRecentQueries] = useState<RecentQuery[]>([]);
+  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
+  const [promotingSlug, setPromotingSlug] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly");
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
@@ -110,12 +122,45 @@ export default function CreatorDashboardPage() {
       setRecentQueries(queries || []);
     }
 
+    // Load sponsorships
+    try {
+      const spRes = await fetch("/api/sponsorship/mine");
+      if (spRes.ok) {
+        const spData = await spRes.json();
+        setSponsorships(spData.sponsorships || []);
+      }
+    } catch {
+      // Non-critical
+    }
+
     setLoading(false);
   }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  const handlePromote = async (toolSlug: string, tier: string) => {
+    setPromotingSlug(toolSlug);
+    try {
+      const res = await fetch("/api/sponsorship/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier, toolSlug, interval: billingInterval }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+      } else {
+        const data = await res.json();
+        alert(data.error || "Something went wrong");
+      }
+    } catch {
+      alert("Connection error. Please try again.");
+    } finally {
+      setPromotingSlug(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -294,6 +339,140 @@ export default function CreatorDashboardPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Promote your tools */}
+        {submissions.some((s) => s.status === "approved") && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-[var(--foreground)]">
+                Promote your tools
+              </h2>
+              <div className="flex items-center gap-1 bg-[var(--card)] border border-[var(--border)] rounded-lg p-0.5">
+                <button
+                  onClick={() => setBillingInterval("monthly")}
+                  className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
+                    billingInterval === "monthly"
+                      ? "bg-[var(--accent)] text-black font-medium"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBillingInterval("yearly")}
+                  className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
+                    billingInterval === "yearly"
+                      ? "bg-[var(--accent)] text-black font-medium"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  Yearly
+                  <span className="ml-1 text-[10px] text-green-400 font-medium">
+                    Save 2 months
+                  </span>
+                </button>
+              </div>
+            </div>
+            <p className="text-sm text-[var(--muted-foreground)] mb-4">
+              Boost visibility with a sponsored placement. Choose a tier for
+              each approved tool.
+            </p>
+            <div className="space-y-3">
+              {submissions
+                .filter((s) => s.status === "approved")
+                .map((sub) => {
+                  const slug = sub.name
+                    .toLowerCase()
+                    .replace(/\s+/g, "-");
+                  const activeSponsorships = sponsorships.filter(
+                    (sp) =>
+                      sp.tool_slug === slug && sp.status === "active"
+                  );
+                  return (
+                    <div
+                      key={sub.id}
+                      className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-medium text-[var(--foreground)]">
+                          {sub.name}
+                        </h3>
+                        {activeSponsorships.length > 0 && (
+                          <div className="flex gap-1.5">
+                            {activeSponsorships.map((sp) => (
+                              <span
+                                key={sp.id}
+                                className="text-[10px] font-medium px-1.5 py-0.5 rounded border bg-amber-500/15 text-amber-400 border-amber-500/30"
+                              >
+                                {sp.tier} active
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {(
+                          [
+                            {
+                              tier: "hero",
+                              label: "Hero Banner",
+                              monthlyPrice: "$99/mo",
+                              yearlyPrice: "$990/yr",
+                              desc: "Full-width banner above the tool grid",
+                            },
+                            {
+                              tier: "grid",
+                              label: "Grid Promoted",
+                              monthlyPrice: "$49/mo",
+                              yearlyPrice: "$490/yr",
+                              desc: "Pinned to top of grid with badge",
+                            },
+                            {
+                              tier: "detail",
+                              label: "Detail Page",
+                              monthlyPrice: "$29/mo",
+                              yearlyPrice: "$290/yr",
+                              desc: "Shown on other tools' detail pages",
+                            },
+                          ] as const
+                        ).map((option) => {
+                          const isActive = activeSponsorships.some(
+                            (sp) => sp.tier === option.tier
+                          );
+                          const price =
+                            billingInterval === "yearly"
+                              ? option.yearlyPrice
+                              : option.monthlyPrice;
+                          return (
+                            <button
+                              key={option.tier}
+                              onClick={() =>
+                                handlePromote(slug, option.tier)
+                              }
+                              disabled={
+                                isActive || promotingSlug === slug
+                              }
+                              className="text-left p-3 rounded-lg border border-[var(--border)] hover:border-[var(--accent)]/50 hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <p className="text-sm font-medium text-[var(--foreground)]">
+                                {option.label}
+                              </p>
+                              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                                {option.desc}
+                              </p>
+                              <p className="text-xs font-medium text-[var(--accent)] mt-1">
+                                {isActive ? "Active" : price}
+                              </p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}

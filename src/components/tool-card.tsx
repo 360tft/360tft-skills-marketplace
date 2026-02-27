@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Tool } from "@/data/tools";
+import { SponsoredBadge } from "./sponsored-badge";
 
 function Badge({ label }: { label: string }) {
   const colors: Record<string, string> = {
@@ -31,7 +32,13 @@ const categoryLabels: Record<string, string> = {
   content: "Content",
 };
 
-export function ToolCard({ tool }: { tool: Tool }) {
+export function ToolCard({
+  tool,
+  isSponsored,
+}: {
+  tool: Tool;
+  isSponsored?: boolean;
+}) {
   return (
     <Link
       href={`/tools/${tool.slug}`}
@@ -56,6 +63,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
       </p>
 
       <div className="flex items-center gap-2 mb-3 flex-wrap">
+        {isSponsored && <SponsoredBadge />}
         {tool.badges.map((b) => (
           <Badge key={b} label={b} />
         ))}
