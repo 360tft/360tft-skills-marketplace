@@ -49,15 +49,15 @@ function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
 
   if (!entry || entry.resetAt < now) {
     tries.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 });
-    return { allowed: true, remaining: 4 };
+    return { allowed: true, remaining: 1 };
   }
 
-  if (entry.count >= 5) {
+  if (entry.count >= 2) {
     return { allowed: false, remaining: 0 };
   }
 
   entry.count++;
-  return { allowed: true, remaining: 5 - entry.count };
+  return { allowed: true, remaining: 2 - entry.count };
 }
 
 async function logActivity(

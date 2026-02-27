@@ -9,7 +9,7 @@ import { SearchFilter } from "@/components/search-filter";
 import { getPublishedTools } from "@/data/tools";
 import type { ToolCategory } from "@/data/tools";
 
-type SortOption = "popular" | "newest";
+type SortOption = "popular" | "newest" | "rated";
 
 const faqItems = [
   {
@@ -92,6 +92,11 @@ export default function HomePage() {
         break;
       case "newest":
         result = [...result].reverse();
+        break;
+      case "rated":
+        result = [...result].sort(
+          (a, b) => (b.avgRating || 0) - (a.avgRating || 0)
+        );
         break;
     }
 

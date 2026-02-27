@@ -81,7 +81,7 @@ function TryItDemo({ tool }: { tool: Tool }) {
   const [response, setResponse] = useState("");
   const [poweredBy, setPoweredBy] = useState<{ name: string; url: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [triesLeft, setTriesLeft] = useState(5);
+  const [triesLeft, setTriesLeft] = useState(2);
 
   const handleTry = async () => {
     if (!query.trim() || triesLeft <= 0) return;
@@ -450,7 +450,7 @@ function StarRating({
 
 function ReviewSection({ toolSlug }: { toolSlug: string }) {
   const [reviews, setReviews] = useState<
-    { id: string; rating: number; review_text: string | null; created_at: string }[]
+    { id: string; rating: number; review_text: string | null; author_response: string | null; author_response_at: string | null; created_at: string }[]
   >([]);
   const [averageRating, setAverageRating] = useState(0);
   const [count, setCount] = useState(0);
@@ -582,6 +582,16 @@ function ReviewSection({ toolSlug }: { toolSlug: string }) {
                 <p className="text-[var(--muted-foreground)]">
                   {review.review_text}
                 </p>
+              )}
+              {review.author_response && (
+                <div className="mt-2 ml-4 pl-3 border-l-2 border-[var(--accent)]/30">
+                  <p className="text-xs text-[var(--accent)] font-medium mb-0.5">
+                    Developer response
+                  </p>
+                  <p className="text-[var(--muted-foreground)]">
+                    {review.author_response}
+                  </p>
+                </div>
               )}
             </div>
           ))}

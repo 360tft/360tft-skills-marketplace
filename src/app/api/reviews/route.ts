@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await db
     .from("tool_reviews")
-    .select("id, tool_slug, rating, review_text, created_at")
+    .select("id, tool_slug, rating, review_text, author_response, author_response_at, created_at")
     .eq("tool_slug", toolSlug)
     .order("created_at", { ascending: false });
 
@@ -53,6 +53,47 @@ export async function GET(req: NextRequest) {
     averageRating: Math.round(averageRating * 10) / 10,
     count: reviews.length,
   });
+}
+
+/**
+ * PATCH /api/reviews - Add author response to a review (admin only)
+ * Body: { reviewId, authorResponse }
+ */
+export async function PATCH(req: NextRequest) {
+  const adminSecret = process.env.ADMIN_SECRET;
+  const authHeader = req.headers.get("authorization");
+
+  if (!adminSecret || authHeader !== `Bearer ${adminSecret}`) {
+    return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  }
+
+  const { reviewId, authorResponse } = await req.json();
+
+  if (!reviewId || !authorResponse?.trim()) {
+    return NextResponse.json(
+      { error: "reviewId and authorResponse are required" },
+      { status: 400 }
+    );
+  }
+
+  const db = getSupabaseAdmin();
+  if (!db) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+
+  const { error } = await db
+    .from("tool_reviews")
+    .update({
+      author_response: authorResponse.trim(),
+      author_response_at: new Date().toISOString(),
+    })
+    .eq("id", reviewId);
+
+  if (error) {
+    return NextResponse.json({ error: "Failed to save response" }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
 }
 
 /**
