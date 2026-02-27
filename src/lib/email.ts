@@ -311,6 +311,14 @@ export async function sendInstallNurtureEmail(
   );
 }
 
+export async function sendSequenceEmail(
+  to: string,
+  subject: string,
+  html: string
+) {
+  await send(to, subject, html);
+}
+
 export async function notifyNewSignup(email: string) {
   await send(
     getAdminEmail(),

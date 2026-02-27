@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sendInstallNurtureEmail } from "@/lib/email";
+import { startSequence } from "@/lib/email-sequences";
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,12 +55,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Send product-specific nurture email (non-blocking)
+    const cleanEmail = email.toLowerCase().trim();
     if (sourceTool) {
-      sendInstallNurtureEmail(
-        email.toLowerCase().trim(),
-        sourceTool
-      ).catch(() => {});
+      sendInstallNurtureEmail(cleanEmail, sourceTool).catch(() => {});
     }
+
+    // Start consumer email sequence (non-blocking)
+    startSequence(cleanEmail, "consumer", sourceTool).catch(() => {});
 
     return NextResponse.json({ success: true, stored: true });
   } catch {

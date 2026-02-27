@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { notifyToolSubmission } from "@/lib/email";
 import { scoreSubmission } from "@/lib/rubric";
+import { startSequence } from "@/lib/email-sequences";
 
 const VALID_TOOL_TYPES = ["mcp_server", "api", "claude_skill", "custom_gpt"];
 
@@ -82,9 +83,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Notify admin (non-blocking)
-    notifyToolSubmission(email.toLowerCase().trim(), name.trim()).catch(
-      () => {}
-    );
+    const cleanEmail = email.toLowerCase().trim();
+    notifyToolSubmission(cleanEmail, name.trim()).catch(() => {});
+
+    // Start creator email sequence (non-blocking)
+    startSequence(cleanEmail, "creator", name.trim()).catch(() => {});
 
     return NextResponse.json({ success: true, stored: true });
   } catch {
