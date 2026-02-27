@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 async function getUser(req: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -86,6 +87,14 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Log activity (non-blocking)
+  const db = getSupabaseAdmin();
+  if (db) {
+    db.from("user_activity")
+      .insert({ user_id: user.id, tool_slug: toolSlug, action: "favourite" })
+      .then(() => {});
   }
 
   return NextResponse.json({ success: true });

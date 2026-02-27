@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
 import { getSupabaseAdmin, isSupabaseConfigured } from "./supabase/admin";
+import { sendRateLimitWarning } from "./email";
 
 // Key prefixes per product
 const PRODUCT_PREFIXES: Record<string, string> = {
@@ -178,6 +179,14 @@ export async function validateAndIncrement(
   }
 
   const result = data[0];
+  const limit = TIER_LIMITS[result.key_tier] || 10;
+  const used = limit - (result.remaining_today ?? 0);
+
+  // Send warning at 80% usage (non-blocking)
+  if (result.key_email && used >= limit * 0.8 && result.remaining_today > 0) {
+    sendRateLimitWarning(result.key_email, used, limit).catch(() => {});
+  }
+
   return {
     valid: result.allowed,
     tier: result.key_tier,

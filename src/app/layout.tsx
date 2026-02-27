@@ -21,6 +21,10 @@ export const metadata: Metadata = {
     "football scouting AI",
   ],
   metadataBase: new URL(baseUrl),
+  icons: {
+    icon: "/logo-32.png",
+    apple: "/logo-180.png",
+  },
   openGraph: {
     title: "AI Football | AI Skills, MCPs & Agents for Football Coaches",
     description:
