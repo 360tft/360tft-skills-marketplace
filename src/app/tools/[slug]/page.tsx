@@ -242,7 +242,7 @@ function InstallModal({
         {!submitted ? (
           <form onSubmit={handleSubmitEmail} className="space-y-3">
             <p className="text-xs text-[var(--muted)]">
-              Enter your email to get the install config and tool updates.
+              Enter your email to get the install instructions and tool updates.
             </p>
             <div className="flex gap-2">
               <input
@@ -263,24 +263,17 @@ function InstallModal({
           </form>
         ) : (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-[var(--foreground)]">
-                <span className="w-5 h-5 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold">
-                  1
-                </span>
-                Open Claude Desktop Settings (gear icon)
-              </div>
-              <div className="flex items-center gap-2 text-sm text-[var(--foreground)]">
-                <span className="w-5 h-5 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold">
-                  2
-                </span>
-                Go to &quot;MCP Servers&quot; and click &quot;Edit Config&quot;
-              </div>
-              <div className="flex items-center gap-2 text-sm text-[var(--foreground)]">
-                <span className="w-5 h-5 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold">
-                  3
-                </span>
-                Add this to your config file:
+            {/* Step 1 */}
+            <div className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                1
+              </span>
+              <div className="text-sm text-[var(--foreground)]">
+                <p className="font-medium">Copy this text</p>
+                <p className="text-[var(--muted-foreground)] mt-1">
+                  Click the button below. It looks like code but you don&apos;t
+                  need to understand it. Just copy it.
+                </p>
               </div>
             </div>
 
@@ -290,15 +283,103 @@ function InstallModal({
               </pre>
               <button
                 onClick={handleCopy}
-                className="absolute top-2 right-2 text-xs px-2 py-1 rounded bg-white/10 text-[var(--foreground)] hover:bg-white/20 transition-colors"
+                className="absolute top-2 right-2 text-xs px-2.5 py-1.5 rounded-md bg-[var(--accent)] text-black font-medium hover:bg-[var(--accent-hover)] transition-colors"
               >
-                {copied ? "Copied" : "Copy"}
+                {copied ? "Copied!" : "Copy to clipboard"}
               </button>
             </div>
 
-            <p className="text-xs text-[var(--muted)]">
-              Restart Claude Desktop after saving. The {tool.name} tool will appear automatically.
-            </p>
+            {/* Step 2 */}
+            <div className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                2
+              </span>
+              <div className="text-sm text-[var(--foreground)]">
+                <p className="font-medium">
+                  Open Claude Desktop settings
+                </p>
+                <p className="text-[var(--muted-foreground)] mt-1">
+                  Open the Claude Desktop app. In the bottom-left corner,
+                  you&apos;ll see a small settings icon. Click it.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                3
+              </span>
+              <div className="text-sm text-[var(--foreground)]">
+                <p className="font-medium">
+                  Click &quot;Developer&quot;, then &quot;Edit Config&quot;
+                </p>
+                <p className="text-[var(--muted-foreground)] mt-1">
+                  In the settings window, look for{" "}
+                  <strong>Developer</strong> on the left side. Click it. Then
+                  click the <strong>Edit Config</strong> button. A text file
+                  will open.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                4
+              </span>
+              <div className="text-sm text-[var(--foreground)]">
+                <p className="font-medium">
+                  Paste and save
+                </p>
+                <p className="text-[var(--muted-foreground)] mt-1">
+                  If the file is empty, just paste what you copied in step 1
+                  and save the file. If there&apos;s already text in the file,{" "}
+                  <strong>select all the existing text</strong>, delete it,
+                  then paste.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 5 */}
+            <div className="flex items-start gap-3">
+              <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                5
+              </span>
+              <div className="text-sm text-[var(--foreground)]">
+                <p className="font-medium">Restart Claude Desktop</p>
+                <p className="text-[var(--muted-foreground)] mt-1">
+                  Close Claude Desktop completely and open it again. You
+                  should see a small hammer icon at the bottom of the chat
+                  box. That means it worked.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3 mt-2">
+              <p className="text-xs text-[var(--muted-foreground)]">
+                <strong className="text-[var(--foreground)]">
+                  Stuck?
+                </strong>{" "}
+                Follow the{" "}
+                <a
+                  href="/docs/claude-desktop"
+                  className="text-[var(--accent)] hover:underline"
+                >
+                  full guide with screenshots
+                </a>{" "}
+                or ask in{" "}
+                <a
+                  href="https://www.skool.com/aifootball"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent)] hover:underline"
+                >
+                  AI Football Skool
+                </a>
+                .
+              </p>
+            </div>
           </div>
         )}
       </div>

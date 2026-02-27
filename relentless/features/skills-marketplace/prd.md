@@ -1,22 +1,23 @@
-# PRD: 360TFT Skills Marketplace
+# PRD: AI Football Skills Marketplace
 
 ## Introduction
 
-A standalone marketplace at **skills.360tft.com** where football coaches discover, install, and use AI-powered tools (skills) for coaching, refereeing, player development, and club management. Kevin's existing products (FootballGPT, RefereeGPT, CoachReflect, game model, session libraries, cheat sheets) are the launch inventory. Builder Bootcamp students can submit their own tools built on Kevin's infrastructure. The marketplace supports installation to Claude Desktop, ChatGPT, and direct web usage.
+A free, open directory at **aifootball.co** where football coaches discover, install, and use AI-powered tools (MCP servers, APIs, Claude skills, Custom GPTs) for coaching, refereeing, player development, and club management. Kevin's existing products (FootballGPT, RefereeGPT, CoachReflect) are the flagship listings. Anyone can submit their football AI tool for free.
 
 **Football only.** No cruise, no generic AI. Every tool on this marketplace serves football coaches, referees, players, or club administrators.
 
-This is the single destination where football meets AI tooling. Kevin owns the marketplace, the core inventory, and the infrastructure that third-party tools run on. First mover advantage in a space where nobody else is building.
+**The first football AI tool marketplace.** Kevin owns the discovery layer. The marketplace is free to list, free to use. Kevin monetises through his own products, courses, API access, Builder Bootcamp, and by listing his tools on external platforms (GPT Store, MCP registries, MCPize, Apify) where they earn directly.
 
 ## Goals
 
 - Become the definitive directory of AI tools for football coaching
-- Drive subscriptions to existing SaaS products (FootballGPT Pro, FCA, RefereeGPT Pro, CoachReflect Pro)
-- Generate direct API revenue from developers via per-call pricing
-- Enable Builder Bootcamp students to publish tools and earn revenue (Kevin takes commission)
-- Capture email addresses from every tool installation for marketing pipeline
+- Drive subscriptions to existing SaaS products (FootballGPT Pro, RefereeGPT Pro, CoachReflect Pro)
+- Capture email addresses from every tool interaction for marketing pipeline
+- Enable anyone to list their football AI tool for free (build ecosystem, build traffic)
 - Surface Kevin's Gumroad digital products (session libraries, game model) as searchable AI tools
-- List on MCP registries, GPT Store, and other AI marketplaces to drive traffic back to skills.360tft.com
+- List Kevin's tools on GPT Store, MCP registries, MCPize, and Apify to earn on those platforms
+- Sell Builder Bootcamp ($497) to developers who want to build their own tools
+- Generate API revenue from Kevin's own tools via per-call pricing (Developer Platform, PRD 58)
 
 ## User Stories
 
@@ -24,7 +25,7 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 **Description:** As a football coach, I want to browse available AI tools so I can find ones that help my coaching.
 
 **Acceptance Criteria:**
-- [ ] Landing page at skills.360tft.com shows all published tools in a card grid
+- [ ] Landing page at aifootball.co shows all published tools in a card grid
 - [ ] Each card shows: tool name, description, category, rating, install count, price (free/pro), author
 - [ ] Filter by category: Coaching, Refereeing, Player Development, Club Management, Analytics, Content
 - [ ] Search by keyword
@@ -85,28 +86,27 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 - [ ] Tool author can respond to reviews
 - [ ] Typecheck passes
 
-### US-007: Register as a developer
-**Description:** As a Builder Bootcamp student, I want to get API keys so I can build my own football AI tool.
+### US-007: Get API access to Kevin's tools
+**Description:** As a developer, I want API keys to use FootballGPT, RefereeGPT, or CoachReflect tools programmatically.
 
 **Acceptance Criteria:**
-- [ ] Developer registration page at `/developer`
-- [ ] Registration requires: name, email, description of what they're building
-- [ ] Kevin approves registrations (notification via Telegram or Hub)
-- [ ] On approval, developer gets API key with prefix `dev_sk_`
+- [ ] Developer portal at `/developer`
+- [ ] Create API key with email (self-service, no approval needed for free tier)
 - [ ] Developer dashboard shows: API keys, usage stats, rate limits
-- [ ] Free tier: 100 calls/day. Paid tier: 1,000 calls/day ($29/month)
+- [ ] Free tier: 10 calls/day. Paid tiers via Developer Platform (PRD 58, July onwards)
+- [ ] API keys only grant access to Kevin's official tools, not third-party listings
 - [ ] Typecheck passes
 
 ### US-008: Submit a tool to the marketplace
-**Description:** As a Builder Bootcamp developer, I want to submit my own AI tool so other coaches can use it.
+**Description:** As a developer, I want to submit my football AI tool so other coaches can discover and use it.
 
 **Acceptance Criteria:**
-- [ ] Submit tool form at `/developer/submit`
-- [ ] Fields: name, description, category, icon, example queries, pricing (free or % of subscription)
-- [ ] Tool runs on Kevin's infrastructure (360tft-mcp) via a developer-defined system prompt + optional data source
-- [ ] Submission goes to review queue (Kevin approves via Hub or Telegram)
-- [ ] On approval, tool appears in marketplace with "Community" badge
-- [ ] Kevin takes 30% commission on any paid tool revenue
+- [ ] Submit tool form at `/submit`
+- [ ] Fields: name, description, category, tool type (MCP server, API, Claude skill, Custom GPT), connection URL, example queries
+- [ ] Developer hosts their own tool (marketplace is a directory, not a host)
+- [ ] Quality rubric auto-checks: football-related, URL responds, description is real
+- [ ] Passes rubric: auto-approved with "Community" badge. Fails: flagged for Kevin to review
+- [ ] Free to list, no commission, no fees
 - [ ] Typecheck passes
 
 ### US-009: Search the game model
@@ -166,7 +166,7 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 - [ ] Actions call the existing `/api/mcp/[action]` endpoints on each product
 - [ ] OpenAI Actions schema (openapi.yaml) generated for each product
 - [ ] Published to GPT Store with Kevin's OpenAI account
-- [ ] Every response includes "Learn more at skills.360tft.com"
+- [ ] Every response includes "Learn more at aifootball.co"
 
 ### US-014: Analytics dashboard
 **Description:** As the marketplace operator, I want to see how tools are performing.
@@ -194,30 +194,27 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 
 ## Functional Requirements
 
-- FR-1: Marketplace web app at skills.360tft.com (Next.js on Coolify)
+- FR-1: Marketplace web app at aifootball.co (Next.js on Coolify)
 - FR-2: Tool cards with name, description, category, rating, installs, price, author
 - FR-3: Tool detail pages with live "Try it" demo, install instructions, reviews
 - FR-4: Category filter: Coaching, Refereeing, Player Development, Club Management, Analytics, Content
 - FR-5: Search by keyword across tool names and descriptions
 - FR-6: User accounts (Supabase Auth) for reviews, developer access, and install tracking
 - FR-7: Email capture gate on tool installation
-- FR-8: Developer registration with approval workflow
-- FR-9: API key management (create, revoke, view usage)
-- FR-10: Tool submission form for Builder Bootcamp developers
-- FR-11: Tool review queue in admin (Kevin approves/rejects)
-- FR-12: Rating and review system (1-5 stars + text)
-- FR-13: Game Model RAG tool: chunk 750-page PDF, embed with Gemini text-embedding-004, pgvector search
-- FR-14: Session Library search tool: index Notion course content, return previews with Gumroad purchase links
-- FR-15: Free Content search tool: full access to free Gumroad products via Notion API
-- FR-16: Custom GPT configs (OpenAI Actions schemas) for FootballGPT and RefereeGPT
-- FR-17: Telegram bot for Herald content approval (inline buttons, Kevin's user ID only)
-- FR-18: Admin analytics dashboard (installs, calls, users, revenue, conversions)
-- FR-19: Email nurture sequence triggered by tool installation
-- FR-20: MCP registry submission configs (Smithery, mcp.so, official registry)
-- FR-21: 30% commission tracking on third-party paid tool usage
-- FR-22: Usage-based billing for developer API access ($29/month for 1,000 calls/day)
-- FR-23: "Powered by 360TFT" branding on all tool responses
-- FR-24: All content must be football-related. Submission review enforces this.
+- FR-8: Open tool submission form (MCP server, API, Claude skill, Custom GPT — any football AI tool)
+- FR-9: Quality rubric auto-check on submissions (football-related, URL responds, description real)
+- FR-10: Tool review queue in admin (edge cases flagged by rubric)
+- FR-11: Rating and review system (1-5 stars + text)
+- FR-12: Game Model RAG tool: chunk 750-page PDF, embed with Gemini text-embedding-004, pgvector search
+- FR-13: Session Library search tool: index Notion course content, return previews with Gumroad purchase links
+- FR-14: Free Content search tool: full access to free Gumroad products via Notion API
+- FR-15: Custom GPT configs (OpenAI Actions schemas) for FootballGPT and RefereeGPT
+- FR-16: Telegram bot for Herald content approval (inline buttons, Kevin's user ID only)
+- FR-17: Admin analytics dashboard (installs, views, users, conversions to Kevin's products)
+- FR-18: Email nurture sequence triggered by tool installation (product-specific)
+- FR-19: MCP registry submission configs (Smithery, mcp.so, official registry) for SEO/backlinks
+- FR-20: API key management for Kevin's own tools only (create, revoke, view usage)
+- FR-21: All content must be football-related. Submission rubric enforces this.
 
 ## Non-Goals (Out of Scope)
 
@@ -227,8 +224,10 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 - No real-time collaboration features between developers
 - No AI-generated tool creation (developers build tools, not an AI builder)
 - No white-labelling of the marketplace for other sports (football only, for now)
-- No auto-approval of third-party tool submissions (Kevin reviews all)
 - No Telegram bot for marketplace admin (Telegram is Herald approval only)
+- No commission or listing fees (marketplace is free, Kevin monetises through his own products)
+- No proxying third-party tools (directory only, developers host their own infrastructure)
+- No hosting tools for others (marketplace lists tools, doesn't run them)
 
 ## Design Considerations
 
@@ -246,18 +245,19 @@ This is the single destination where football meets AI tooling. Kevin owns the m
 ### Architecture
 
 ```
-skills.360tft.com (Next.js on Coolify)
+aifootball.co (Next.js on dedicated Hetzner server)
     |
-    ├── /tools/[slug]         → Tool detail + "Try it" demo
-    ├── /developer            → Developer portal + API keys
-    ├── /developer/submit     → Tool submission form
+    ├── /tools/[slug]         → Tool detail + "Try it" demo (Kevin's tools only)
+    ├── /submit               → Open tool submission form (anyone)
+    ├── /developer            → Developer portal + API keys (Kevin's tools only)
     ├── /admin                → Analytics + review queue
     |
-    ├── Supabase              → Users, tools, reviews, API keys, installs, analytics
-    ├── Upstash Redis         → Rate limiting, usage tracking
-    ├── 360tft-mcp gateway    → Serves all tool API calls
-    └── Stripe                → Developer billing, commission tracking
+    ├── Supabase              → Users, tools, reviews, API keys, installs, analytics (own project)
+    ├── Upstash Redis         → Rate limiting for "Try it" demo
+    └── Resend                → Email capture + product-specific nurture sequences
 ```
+
+Third-party tools link directly to the developer's infrastructure. The marketplace is a directory, not a proxy or gateway. Only Kevin's own tools have "Try it" demos and API key access through the marketplace.
 
 ### Database Tables (new Supabase project or extend FootballGPT)
 
@@ -320,17 +320,19 @@ developer_applications (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Tool submissions for review
+-- Tool submissions (open directory model)
 tool_submissions (
   id UUID PRIMARY KEY,
   developer_id UUID REFERENCES profiles(id),
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   category TEXT NOT NULL,
-  system_prompt TEXT NOT NULL,
+  tool_type TEXT NOT NULL,  -- mcp_server, api, claude_skill, custom_gpt
+  connection_url TEXT,      -- MCP server URL, API endpoint, GPT Store link
   example_queries JSONB,
-  pricing_type TEXT DEFAULT 'free',
-  status TEXT DEFAULT 'pending',  -- pending, approved, rejected
+  rubric_score INTEGER,     -- auto-check score (0-100)
+  rubric_flags JSONB,       -- auto-check details (football_related, url_responds, description_quality)
+  status TEXT DEFAULT 'pending',  -- pending, auto_approved, flagged, approved, rejected
   rejection_reason TEXT,
   reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -398,88 +400,144 @@ The Actions call the same `/api/mcp/[action]` routes. Authentication via API key
 
 | Component | Where | Domain |
 |-----------|-------|--------|
-| Marketplace web app | Coolify | skills.360tft.com |
-| MCP gateway | Coolify | mcp.360tft.com (already deployed) |
-| Herald + Telegram bot | Coolify | (no public domain) |
-| Supabase | Cloud | (new project or extend existing) |
-| Game Model RAG | Supabase pgvector | (same project) |
+| Marketplace web app | Dedicated Hetzner server | aifootball.co |
+| Supabase | Cloud (own project) | — |
+| Telegram bot | Coolify (standalone Docker) | — |
+| Game Model RAG | Supabase pgvector (same project) | — |
 
-## Monetisation Phases
+## Monetisation Strategy
 
-### Phase 1 (Launch): Free discovery, funnel to existing products
-- All Kevin's tools free with rate limits
-- Every response brands to product website
-- Email capture on every installation
-- Email nurture drives subscriptions to FootballGPT Pro ($10.99/mo), FCA ($29/mo), etc.
+**The marketplace is a traffic play, not a transaction play.** Free to list, free to use. Kevin monetises through his own products, not by taking a cut of other people's tools.
 
-### Phase 2 (Month 2-3): Developer API access
-- Builder Bootcamp students get free API keys (100 calls/day)
-- Developer tier: $29/month for 1,000 calls/day
-- Developers build tools for their own coaching businesses
+### How it makes money
+- **Kevin's tools are the flagship listings.** FootballGPT, RefereeGPT, CoachReflect prominently featured with "Official" badges. Free tier drives upgrades to paid subscriptions.
+- **Email capture on every interaction.** Product-specific nurture sequences drive subscription conversions.
+- **Builder Bootcamp sales.** Developers who want to build their own tools buy the $497 Bootcamp.
+- **API access to Kevin's tools.** Developers pay for higher-tier API access to FootballGPT, RefereeGPT, CoachReflect APIs.
+- **Courses.** AI Football Skool, Custom GPT course ($29), linked from marketplace.
+- **Strategy calls.** £297 calls linked from marketplace for clubs/orgs wanting custom solutions.
 
-### Phase 3 (Month 3-6): Third-party tools + commission
-- Community tools go live in marketplace
-- Free tools: no commission (drives ecosystem growth)
-- Paid tools: Kevin takes 30% commission
-- Tool authors earn 70% of subscription or per-call revenue attributed to their tool
+### What the marketplace is NOT
+- NOT a transaction platform. No commission on third-party tools.
+- NOT a proxy/gateway. Third-party tools connect directly to the developer's infrastructure.
+- NOT a hosting platform. Developers host their own MCP servers, APIs, skills.
 
-### Phase 4 (Month 6+): Premium marketplace features
-- Featured tool placement (paid by tool authors)
-- "Verified" badge for tools that pass quality review
-- Bulk/enterprise API access for clubs and academies
-- White-label API for coaching platforms
+### The marketplace is a directory
+- Anyone can submit their football AI tool (MCP server, API, Claude skill, Custom GPT)
+- Free to list, no commission, no fees
+- Kevin owns the discovery layer and the traffic
+- First mover advantage: the only football-specific AI tool directory
 
 ## Success Metrics
 
-- 100 tool installs in first month
+- 50+ tools listed (Kevin's + community submissions) within 3 months
 - 500 email captures in first month
-- 10% conversion from marketplace email to product trial
-- 5 Builder Bootcamp students submit tools in first 3 months
-- $500/month additional MRR attributed to marketplace within 6 months
+- 10% conversion from marketplace email to product trial/signup
 - 3 Custom GPTs published to GPT Store with 100+ conversations each
+- Kevin's MCP tools listed on 3+ external registries (MCP Registry, Smithery, MCPize)
 - Game Model RAG tool gets 50+ daily queries within 3 months
+- $500/month additional MRR attributed to marketplace traffic within 6 months
 
-## Implementation Phases
+## Task List
 
-### Phase 1: Marketplace MVP + Game Model RAG (Week 1-2)
-- [ ] Set up Next.js app at skills.360tft.com on Coolify
-- [ ] Seed database with Kevin's 14 existing MCP tools + 15 Gumroad products
-- [ ] Tool browse page (card grid, categories, search)
-- [ ] Tool detail page with "Try it" demo
-- [ ] Claude Desktop install flow (email capture + JSON config copy)
-- [ ] Game Model: chunk PDF, embed, pgvector search, add to MCP gateway
-- [ ] Session Library: index Notion content, keyword search, add to MCP gateway
+### What's Done
+- [x] Next.js app set up and running
+- [x] Tool browse page (card grid, categories, search)
+- [x] Tool detail pages with "Try it" demo
+- [x] Claude Desktop install flow (email capture + JSON config copy)
+- [x] ChatGPT install flow
+- [x] Custom GPT schemas for FootballGPT, RefereeGPT, CoachReflect (in `/custom-gpts/`)
+- [x] Supabase auth + user profiles
+- [x] Developer portal + API key system (create, revoke, validate, usage tracking)
+- [x] Tool submission form (basic)
+- [x] Admin analytics dashboard
+- [x] Email capture on install
+- [x] Activity tracking + user favourites
+- [x] Documentation pages (Claude Desktop, ChatGPT, API, MCP, OpenClaw)
+- [x] SEO foundation (sitemap, robots, OG images)
+- [x] Rebrand to AI Football (aifootball.co)
+- [x] 11 official tools seeded (5 FootballGPT, 3 RefereeGPT, 3 CoachReflect)
 
-### Phase 2: Custom GPTs + Reviews (Week 2-3)
-- [ ] Create OpenAI Actions schemas for FootballGPT and RefereeGPT
-- [ ] Build and publish Custom GPTs to GPT Store
-- [ ] Add "Use in ChatGPT" buttons to tool detail pages
-- [ ] Rating and review system
-- [ ] Admin analytics dashboard
+### Phase 1: Polish + Commit (Now)
 
-### Phase 3: Developer Portal (Week 3-4)
-- [ ] Developer registration + approval workflow
-- [ ] API key management (create, revoke, usage stats)
-- [ ] Developer documentation page
-- [ ] Tool submission form
-- [ ] Tool review queue in admin
+| # | Task | Status |
+|---|------|--------|
+| 1 | Commit Claude Desktop docs UX improvements (uncommitted) | TODO |
+| 2 | Commit tool detail page install modal improvements (uncommitted) | TODO |
+| 3 | Add sort options to browse page (popularity, newest, highest rated) | TODO |
+| 4 | Add related tools section to tool detail pages | TODO |
+| 5 | Add "Powered by [Product]" branding to all "Try it" responses | TODO |
 
-### Phase 4: Telegram Bot + Email Nurture (Week 4-5)
-- [ ] Telegram bot for Herald content approval
-- [ ] Email capture nurture sequence (4 emails over 14 days)
-- [ ] Conversion tracking (marketplace -> install -> signup -> subscription)
+### Phase 2: Open Submissions (Directory Model)
 
-### Phase 5: Commission + Billing (Week 6-8)
-- [ ] Stripe billing for developer API access ($29/month)
-- [ ] Commission tracking for third-party paid tools
-- [ ] Revenue dashboard for tool authors
-- [ ] MCP registry submissions (Smithery, mcp.so, official)
+| # | Task | Status |
+|---|------|--------|
+| 6 | Rewrite submission form to accept any tool type (MCP server URL, API endpoint, Claude skill, Custom GPT link) | TODO |
+| 7 | Build quality rubric auto-check (football-related keyword match, URL responds, description length/quality) | TODO |
+| 8 | Update admin review queue for edge cases only (auto-approved tools skip queue) | TODO |
+| 9 | Add "Community" badge for third-party tools vs "Official" for Kevin's | TODO |
+| 10 | Write submission guidelines page (/docs/submit — what's accepted, how it works, what tool types) | TODO |
 
-## Open Questions
+### Phase 3: Reviews + Content Tools
 
-1. Should the marketplace have its own Supabase project or share with FootballGPT?
-2. Should game model RAG be free (lead magnet) or freemium (10 searches/day free, unlimited with purchase)?
-3. What commission percentage feels right for Builder Bootcamp tools — 30% (App Store standard) or lower to encourage submissions?
-4. Should the email nurture sequence be product-specific (based on which tool they installed) or generic?
-5. Does Kevin want to review all marketplace tool submissions personally, or delegate to a quality rubric that could be semi-automated?
-6. Should the Telegram bot be a standalone service or bundled into Herald?
+| # | Task | Status |
+|---|------|--------|
+| 11 | Rating and review system (1-5 stars + text, display on cards and detail pages) | TODO |
+| 12 | Migration: `tool_reviews` table + RLS policies | TODO |
+| 13 | Game Model RAG tool (chunk 750-page PDF, embed with Gemini, pgvector search, 10/day free) | TODO |
+| 14 | Session Library search tool (index Notion content, keyword search, Gumroad purchase links) | TODO |
+| 15 | Cheat sheets / free content search tool (full content, no rate limit, CTA to paid products) | TODO |
+
+### Phase 4: External Platform Distribution
+
+| # | Task | Status |
+|---|------|--------|
+| 16 | Package Kevin's MCP tools as standalone npm packages (prerequisite for all registries) | TODO |
+| 17 | Publish Custom GPTs to ChatGPT GPT Store (verify domains, add privacy policies, submit via OpenAI editor) | TODO — Kevin must do this manually in ChatGPT UI |
+| 18 | Submit MCP servers to official MCP Registry (registry.modelcontextprotocol.io) | TODO |
+| 19 | Submit MCP servers to Smithery (`smithery mcp publish`) | TODO |
+| 20 | Submit to MCPize for paid per-call monetisation (85% revenue share) | TODO |
+| 21 | Evaluate Apify Actors for additional distribution (130k monthly signups) | TODO |
+| 22 | Submit to AI tool directories (mcp.so, awesome-mcp-servers, etc.) for SEO backlinks | TODO |
+
+### Phase 5: Email Nurture + Conversion
+
+| # | Task | Status |
+|---|------|--------|
+| 23 | Build product-specific email nurture sequences (4 emails over 14 days per product) | TODO |
+| 24 | FootballGPT nurture: tool tips → related tools → FootballGPT Pro intro → upgrade pitch | TODO |
+| 25 | RefereeGPT nurture: tool tips → related tools → RefereeGPT Pro intro → upgrade pitch | TODO |
+| 26 | CoachReflect nurture: tool tips → related tools → CoachReflect Pro intro → upgrade pitch | TODO |
+| 27 | Generic nurture (for non-product-specific tools): marketplace tips → AI Football Skool → Bootcamp pitch | TODO |
+| 28 | Conversion tracking (marketplace visit → tool install → product signup → subscription) | TODO |
+
+### Phase 6: Infrastructure
+
+| # | Task | Status |
+|---|------|--------|
+| 29 | Provision dedicated Hetzner server for marketplace | DONE (49.13.85.185) |
+| 30 | Set up Docker/deployment pipeline on Hetzner server | DONE (Coolify UUID: fs4ow08w4sgssog88sckggs0) |
+| 31 | Deploy marketplace to dedicated Hetzner server | DONE (serving at aifootball.co) |
+| 32 | DNS cutover for aifootball.co to Hetzner server | DONE |
+| 33 | Verify SSL, builds, and routing on new server | DONE |
+| 34 | Set up Supabase project (own project, separate from FootballGPT) | DONE (urgaadsrsvjszlsdmfgc) |
+| 35 | Run all migrations (api_keys, tool_submissions, auth_profiles, user_activity) on new Supabase | DONE (7 tables confirmed) |
+
+### Backlog (Later)
+
+| # | Task | Status |
+|---|------|--------|
+| 36 | Telegram bot for Herald content approval (standalone Docker container) | TODO |
+| 37 | Featured/verified placement tiers (introduce once there's traffic — potential future revenue) | TODO |
+| 38 | Stripe per-call billing for Kevin's tools via Developer Platform (PRD 58, July onwards) | TODO |
+
+## Decisions (Resolved 2026-02-26)
+
+1. **Supabase:** Own project (separate from FootballGPT). Clean isolation, independent scaling.
+2. **Game Model RAG:** Freemium. 10 searches/day free, unlimited with Gumroad purchase ($40).
+3. **Monetisation model:** Free to list, free to use. No commission, no listing fees. Build audience first, introduce featured/verified placements later once there's traffic. Kevin monetises through his own products, courses, API access, and Bootcamp sales. Also earns from tools listed on external platforms (GPT Store revenue share, paid MCP servers via Stripe per-call, MCPize/Apify).
+4. **Email nurture:** Product-specific. If they installed a RefereeGPT tool, nurture toward RefereeGPT Pro. Higher conversion.
+5. **Tool submissions:** Semi-automated with quality rubric. Auto-approve if football-related, working demo, no spam. Kevin reviews edge cases.
+6. **Telegram bot:** Standalone Docker container on Coolify. Independent lifecycle, easy to remove if not needed.
+7. **Architecture:** Marketplace is a directory, not a proxy. Third-party tools connect directly to developer infrastructure. Only Kevin's own tools have API key access through the marketplace.
+8. **Tool types accepted:** MCP servers, APIs, Claude skills, Custom GPTs. Any football AI tool.

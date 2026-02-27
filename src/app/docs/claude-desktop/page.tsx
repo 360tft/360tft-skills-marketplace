@@ -83,13 +83,16 @@ export default function ClaudeDesktopDocsPage() {
         </nav>
 
         <h1 className="text-3xl font-bold text-[var(--foreground)] mb-3">
-          Claude Desktop Setup
+          Add Football AI Tools to Claude Desktop
         </h1>
-        <p className="text-[var(--muted-foreground)] leading-relaxed mb-8">
-          Install FootballGPT, RefereeGPT, and CoachReflect as MCP tools in
-          Claude Desktop. Takes about 2 minutes. After setup, you can ask
-          Claude to plan sessions, look up laws, log reflections, and animate
-          drills directly in conversation.
+        <p className="text-[var(--muted-foreground)] leading-relaxed mb-3">
+          This gives Claude the ability to plan sessions, look up laws of the
+          game, log coaching reflections, and create animated drills — all
+          inside your normal Claude conversations.
+        </p>
+        <p className="text-sm text-[var(--muted)] mb-8">
+          Takes about 2 minutes. No coding knowledge needed — just copy, paste,
+          and save.
         </p>
 
         {/* Prerequisites */}
@@ -97,61 +100,41 @@ export default function ClaudeDesktopDocsPage() {
           <h2 className="font-semibold text-[var(--foreground)] mb-2">
             Before you start
           </h2>
-          <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
-            <li>
-              You need{" "}
-              <a
-                href="https://claude.ai/download"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--accent)] hover:underline"
-              >
-                Claude Desktop
-              </a>{" "}
-              installed (Mac, Windows, or Linux)
-            </li>
-            <li>
-              Free tier: 10 tool calls per day. Upgrade to a product
-              subscription for more.
-            </li>
-          </ul>
+          <p className="text-sm text-[var(--muted-foreground)]">
+            You need the Claude Desktop app installed on your computer. If you
+            don&apos;t have it yet,{" "}
+            <a
+              href="https://claude.ai/download"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] hover:underline"
+            >
+              download it here
+            </a>{" "}
+            (available for Mac, Windows, and Linux). It&apos;s free.
+          </p>
         </div>
 
         {/* Step 1 */}
-        <div className="mb-8">
+        <div className="mb-10">
           <div className="flex items-center gap-3 mb-3">
             <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
               1
             </span>
             <h2 className="text-lg font-semibold text-[var(--foreground)]">
-              Open Claude Desktop settings
+              Copy this text
             </h2>
           </div>
-          <p className="text-sm text-[var(--muted-foreground)] leading-relaxed ml-10">
-            Click the gear icon in the top-right of Claude Desktop, then go to
-            the <strong>MCP Servers</strong> section. Click{" "}
-            <strong>Edit Config</strong> to open your config file.
-          </p>
-        </div>
-
-        {/* Step 2 */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
-              2
-            </span>
-            <h2 className="text-lg font-semibold text-[var(--foreground)]">
-              Add the config
-            </h2>
-          </div>
-          <div className="ml-10 space-y-4">
+          <div className="ml-10 space-y-3">
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              To install all 3 products at once, paste this into your config
-              file:
+              This block of text tells Claude where to find the football tools.
+              You don&apos;t need to understand what it means. Just click{" "}
+              <strong>Copy</strong> and move on to step 2.
             </p>
-            <CodeBlock code={fullConfig} label="All products" />
+            <CodeBlock code={fullConfig} />
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Or install one at a time:
+              That gives you all 3 products (FootballGPT, RefereeGPT, and
+              CoachReflect). If you only want one, click below:
             </p>
             <details className="group">
               <summary className="text-sm text-[var(--accent)] cursor-pointer hover:underline">
@@ -180,36 +163,102 @@ export default function ClaudeDesktopDocsPage() {
           </div>
         </div>
 
+        {/* Step 2 */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
+              2
+            </span>
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">
+              Open Claude Desktop settings
+            </h2>
+          </div>
+          <div className="ml-10 space-y-3 text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p>
+              Open the Claude Desktop app on your computer. In the{" "}
+              <strong>bottom-left corner</strong> of the window, you&apos;ll see
+              a small settings icon. Click it.
+            </p>
+            <p>
+              A settings window will appear. On the left side, look for{" "}
+              <strong>Developer</strong> and click it.
+            </p>
+            <p>
+              Then click the <strong>Edit Config</strong> button. This will
+              open a text file on your computer — it might look blank, and
+              that&apos;s fine.
+            </p>
+          </div>
+        </div>
+
         {/* Step 3 */}
-        <div className="mb-8">
+        <div className="mb-10">
           <div className="flex items-center gap-3 mb-3">
             <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
               3
             </span>
             <h2 className="text-lg font-semibold text-[var(--foreground)]">
-              Restart Claude Desktop
+              Paste and save
             </h2>
           </div>
-          <p className="text-sm text-[var(--muted-foreground)] leading-relaxed ml-10">
-            Save the config file and restart Claude Desktop. You should see a
-            tools icon (hammer) in the chat input. Click it to confirm your MCP
-            servers are connected.
-          </p>
+          <div className="ml-10 space-y-3 text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p>
+              In the text file that just opened:
+            </p>
+            <ol className="list-decimal list-inside space-y-1.5 ml-1">
+              <li>
+                If there&apos;s any existing text, select it all and delete it
+              </li>
+              <li>
+                Paste the text you copied in step 1 (Ctrl+V on Windows, Cmd+V
+                on Mac)
+              </li>
+              <li>
+                Save the file (Ctrl+S on Windows, Cmd+S on Mac)
+              </li>
+              <li>Close the text file</li>
+            </ol>
+          </div>
         </div>
 
-        {/* Step 4 - Try it */}
-        <div className="mb-8">
+        {/* Step 4 */}
+        <div className="mb-10">
           <div className="flex items-center gap-3 mb-3">
             <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
               4
             </span>
             <h2 className="text-lg font-semibold text-[var(--foreground)]">
-              Try it
+              Restart Claude Desktop
+            </h2>
+          </div>
+          <div className="ml-10 space-y-3 text-sm text-[var(--muted-foreground)] leading-relaxed">
+            <p>
+              Close Claude Desktop completely and open it again. When it
+              reopens, look at the bottom of the chat box — you should see a
+              small hammer icon. That means the football tools are connected
+              and ready to use.
+            </p>
+            <p>
+              If you don&apos;t see the hammer, try closing and reopening
+              Claude Desktop one more time.
+            </p>
+          </div>
+        </div>
+
+        {/* Step 5 - Try it */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="w-7 h-7 rounded-full bg-[var(--accent)] text-black flex items-center justify-center text-sm font-bold shrink-0">
+              5
+            </span>
+            <h2 className="text-lg font-semibold text-[var(--foreground)]">
+              Try it out
             </h2>
           </div>
           <div className="ml-10 space-y-3">
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              Start a new conversation and try these:
+              Start a new conversation in Claude Desktop and type any of these.
+              Claude will automatically use the football tools to answer:
             </p>
             <div className="space-y-2">
               {[
@@ -226,6 +275,10 @@ export default function ClaudeDesktopDocsPage() {
                 </div>
               ))}
             </div>
+            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+              You get 10 free tool calls per day. Upgrade to a product
+              subscription for unlimited use.
+            </p>
           </div>
         </div>
 
@@ -273,38 +326,81 @@ export default function ClaudeDesktopDocsPage() {
         {/* Troubleshooting */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-[var(--foreground)] mb-4">
-            Troubleshooting
+            Something not working?
           </h2>
           <div className="space-y-4">
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
               <h3 className="font-medium text-[var(--foreground)] mb-2">
-                Tools not appearing after restart
+                I don&apos;t see the hammer icon after restarting
               </h3>
-              <ul className="text-sm text-[var(--muted-foreground)] space-y-1">
-                <li>Make sure you saved the config file before restarting</li>
-                <li>Check the JSON is valid (no trailing commas, matching braces)</li>
-                <li>If you already have an existing config, merge the mcpServers entries rather than replacing the whole file</li>
+              <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
+                <li>
+                  Make sure you saved the text file before closing it. Go back
+                  to step 2, click <strong>Edit Config</strong> again, and
+                  check the text is there. If it&apos;s blank, paste it again
+                  and save.
+                </li>
+                <li>
+                  Make sure you copied the entire block of text from step 1,
+                  including the very first and very last curly brackets.
+                </li>
+                <li>
+                  Try closing Claude Desktop completely (not just minimising)
+                  and opening it again.
+                </li>
               </ul>
             </div>
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
               <h3 className="font-medium text-[var(--foreground)] mb-2">
-                Tool calls failing or timing out
+                The tools aren&apos;t responding
               </h3>
-              <ul className="text-sm text-[var(--muted-foreground)] space-y-1">
-                <li>Check your internet connection</li>
-                <li>The free tier has 10 calls/day. If you're hitting the limit, upgrade to a product subscription</li>
-                <li>If a specific tool keeps failing, try the others. One product may be undergoing maintenance</li>
+              <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
+                <li>
+                  Check you&apos;re connected to the internet.
+                </li>
+                <li>
+                  The free tier gives you 10 tool uses per day. If you&apos;ve
+                  used them all, they&apos;ll work again tomorrow, or you can
+                  upgrade for unlimited use.
+                </li>
               </ul>
             </div>
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
               <h3 className="font-medium text-[var(--foreground)] mb-2">
-                Config file location
+                I can&apos;t find the Developer option in settings
               </h3>
-              <div className="text-sm text-[var(--muted-foreground)] space-y-1">
-                <p><strong>Mac:</strong> ~/Library/Application Support/Claude/claude_desktop_config.json</p>
-                <p><strong>Windows:</strong> %APPDATA%\Claude\claude_desktop_config.json</p>
-                <p><strong>Linux:</strong> ~/.config/Claude/claude_desktop_config.json</p>
-              </div>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                Make sure you&apos;re using the Claude Desktop app (not the
+                website claude.ai). The Developer option is only in the desktop
+                app. If you still can&apos;t find it, your version might need
+                updating — download the latest version from{" "}
+                <a
+                  href="https://claude.ai/download"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent)] hover:underline"
+                >
+                  claude.ai/download
+                </a>
+                .
+              </p>
+            </div>
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <h3 className="font-medium text-[var(--foreground)] mb-2">
+                Still stuck?
+              </h3>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                Ask in{" "}
+                <a
+                  href="https://www.skool.com/aifootball"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent)] hover:underline"
+                >
+                  AI Football Skool
+                </a>{" "}
+                and we&apos;ll help you get set up.
+              </p>
             </div>
           </div>
         </div>
