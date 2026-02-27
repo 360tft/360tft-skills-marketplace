@@ -14,7 +14,7 @@ export function Header() {
               AI Football
             </span>
             <span className="text-[var(--muted)] text-xs ml-1.5 hidden sm:inline">
-              The AI agent marketplace
+              by 360TFT
             </span>
           </div>
         </Link>

@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     "referee AI tools",
     "football scouting AI",
   ],
+  authors: [{ name: "360TFT", url: "https://360tft.co.uk" }],
+  creator: "360TFT",
+  publisher: "SVMS Consultancy Limited",
   metadataBase: new URL(baseUrl),
   icons: {
     icon: "/logo-32.png",
@@ -35,6 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    creator: "@360_tft",
     title: "AI Football | AI Skills, MCPs & Agents for Football Coaches",
     description:
       "Install AI tools for coaching, refereeing, and scouting to Claude Desktop, ChatGPT, or use on the web.",
@@ -44,6 +48,25 @@ export const metadata: Metadata = {
   },
 };
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "360TFT",
+  url: "https://360tft.co.uk",
+  logo: `${baseUrl}/logo-512.png`,
+  description: "Football coaching education and development",
+  foundingDate: "2020",
+  parentOrganization: {
+    "@type": "Organization",
+    name: "SVMS Consultancy Limited",
+  },
+  sameAs: [
+    "https://twitter.com/360_tft",
+    "https://www.skool.com/360tft-7374",
+    "https://www.skool.com/coachingacademy",
+  ],
+};
+
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -51,6 +74,7 @@ const websiteJsonLd = {
   url: baseUrl,
   description:
     "The first AI agent marketplace for football. MCP tools, agents, and APIs for coaching, refereeing, scouting, and club management.",
+  publisher: { "@type": "Organization", name: "360TFT" },
   potentialAction: {
     "@type": "SearchAction",
     target: {
@@ -77,6 +101,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DPTCP1LTH8');`,
           }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <script
           type="application/ld+json"
