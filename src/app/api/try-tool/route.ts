@@ -3,6 +3,12 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createServerClient } from "@supabase/ssr";
 import crypto from "crypto";
 import { extractTopics } from "@/lib/query-analysis";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import {
+  searchGameModel,
+  searchSessions,
+  searchCheatsheets,
+} from "@/lib/content/search";
 
 // Product base URLs for direct API calls
 const PRODUCT_URLS: Record<string, string> = {
@@ -40,24 +46,28 @@ function toolNameToAction(mcpToolName: string): string {
   return TOOL_TO_ACTION[mcpToolName] || mcpToolName.replace(/_/g, "-");
 }
 
-// Simple in-memory rate limiting
-const tries = new Map<string, { count: number; resetAt: number }>();
+// Local tools served from this app's own database (not proxied to external products)
+const LOCAL_TOOLS: Record<string, (query: string) => Promise<string>> = {
+  search_game_model: searchGameModel,
+  search_sessions: searchSessions,
+  search_cheatsheets: searchCheatsheets,
+};
 
-function getRateLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = tries.get(ip);
+// Tools exempt from rate limiting (lead magnets)
+const LOCAL_TOOLS_NO_RATE_LIMIT = new Set(["search_cheatsheets"]);
 
-  if (!entry || entry.resetAt < now) {
-    tries.set(ip, { count: 1, resetAt: now + 24 * 60 * 60 * 1000 });
-    return { allowed: true, remaining: 1 };
+/**
+ * Extract real client IP from x-forwarded-for header.
+ * Behind Traefik, the proxy appends the real IP as the last entry.
+ * Reading the rightmost value prevents client-side spoofing (MEDIUM-1 fix).
+ */
+function getClientIp(req: NextRequest): string {
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const parts = forwardedFor.split(",").map((s) => s.trim());
+    return parts[parts.length - 1] || "unknown";
   }
-
-  if (entry.count >= 2) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  entry.count++;
-  return { allowed: true, remaining: 2 - entry.count };
+  return "unknown";
 }
 
 async function logActivity(
@@ -88,8 +98,7 @@ async function logActivity(
       userId = user?.id ?? null;
     }
 
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    const ip = getClientIp(req);
     const anonymousId = userId
       ? null
       : crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
@@ -110,22 +119,7 @@ async function logActivity(
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-  const { allowed, remaining } = getRateLimit(ip);
-
-  if (!allowed) {
-    return NextResponse.json(
-      {
-        error: "Rate limit exceeded",
-        message:
-          "You have used all 5 free tries today. Install this tool or subscribe for unlimited access.",
-      },
-      {
-        status: 429,
-        headers: { "X-RateLimit-Remaining": "0" },
-      }
-    );
-  }
+  const ip = getClientIp(req);
 
   try {
     const { mcpServerPath, mcpToolName, query } = await req.json();
@@ -134,6 +128,62 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
+      );
+    }
+
+    // --- Local tools (served from this app's database) ---
+    const localHandler = LOCAL_TOOLS[mcpToolName];
+    if (localHandler) {
+      // Cheat sheets are free (no rate limit), others are rate-limited
+      if (!LOCAL_TOOLS_NO_RATE_LIMIT.has(mcpToolName)) {
+        const { allowed, remaining } = await checkRateLimit(
+          `try:${ip}`,
+          RATE_LIMITS.TRY_TOOL
+        );
+        if (!allowed) {
+          return NextResponse.json(
+            {
+              error: "Rate limit exceeded",
+              message:
+                "You have used all your free tries today. Install this tool or subscribe for unlimited access.",
+            },
+            { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
+          );
+        }
+
+        const result = await localHandler(query);
+        logActivity(req, mcpToolName, query).catch(() => {});
+        return NextResponse.json(
+          {
+            result,
+            poweredBy: { name: "360TFT", url: "https://360tft.co.uk" },
+          },
+          { headers: { "X-RateLimit-Remaining": String(remaining) } }
+        );
+      }
+
+      // No rate limit path (cheat sheets)
+      const result = await localHandler(query);
+      logActivity(req, mcpToolName, query).catch(() => {});
+      return NextResponse.json({
+        result,
+        poweredBy: { name: "360TFT", url: "https://360tft.co.uk" },
+      });
+    }
+
+    // --- External tools (proxied to product APIs) ---
+    const { allowed, remaining } = await checkRateLimit(
+      `try:${ip}`,
+      RATE_LIMITS.TRY_TOOL
+    );
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          message:
+            "You have used all your free tries today. Install this tool or subscribe for unlimited access.",
+        },
+        { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
       );
     }
 
@@ -169,7 +219,8 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json();
-    const result = data.text || data.result || data.content || JSON.stringify(data);
+    const result =
+      data.text || data.result || data.content || JSON.stringify(data);
     const productName = PRODUCT_NAMES[mcpServerPath] || mcpServerPath;
 
     // Log activity (non-blocking)
@@ -182,7 +233,7 @@ export async function POST(req: NextRequest) {
       },
       { headers: { "X-RateLimit-Remaining": String(remaining) } }
     );
-  } catch (err) {
+  } catch {
     return NextResponse.json({
       result: `Connection error. The product API may be temporarily unavailable. Install this tool to Claude Desktop for the full experience.`,
       demo: true,

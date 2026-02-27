@@ -56,12 +56,26 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes — redirect to login if not authenticated
   if (
-    (pathname.startsWith("/dashboard") || pathname.startsWith("/developer")) &&
+    (pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/developer") ||
+      pathname.startsWith("/admin")) &&
     !user
   ) {
     const loginUrl = new URL("/auth/login", appUrl);
     loginUrl.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Admin routes — require admin role
+  if (pathname.startsWith("/admin") && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role !== "admin") {
+      return NextResponse.redirect(new URL("/", appUrl));
+    }
   }
 
   // Redirect authenticated users away from login page

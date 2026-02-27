@@ -392,6 +392,116 @@ export const tools: Tool[] = [
     installMethods: ["claude_desktop", "chatgpt", "web"],
   },
 
+  // ===== 360TFT Content Tools (3 tools) =====
+  {
+    id: "tft-game-model",
+    slug: "game-model-search",
+    name: "Game Model Search",
+    description:
+      "Search the 360TFT Game Model — 750+ pages covering formations, tactics, player development, and coaching methodology by Coach Kevin Middleton.",
+    longDescription:
+      "Search the complete 360TFT Game Model, a 750+ page coaching resource created by Coach Kevin Middleton. Covers formations, principles of play, player roles, tactical frameworks, opposition analysis, pressing systems, and age-specific development pathways from U5 to Senior level.\n\nThe Game Model is used by coaches across grassroots and academy football to build structured coaching programmes. Ask any question about coaching methodology and get relevant sections from the full resource.",
+    category: "coaching",
+    iconEmoji: "\uD83D\uDCD5",
+    authorName: "Coach Kevin",
+    authorType: "official",
+    mcpServerPath: "local",
+    mcpToolName: "search_game_model",
+    pricingType: "freemium",
+    productUrl: "https://360tft.co.uk",
+    isPublished: true,
+    installCount: 0,
+    exampleQueries: [
+      "What formations work best for U12 development?",
+      "How should I teach pressing triggers to grassroots teams?",
+      "What are the principles of play for building from the back?",
+      "Player development pathway from U8 to U14",
+    ],
+    inputParams: [
+      {
+        name: "query",
+        description: "Your coaching methodology question",
+        required: true,
+      },
+    ],
+    avgRating: 0,
+    reviewCount: 0,
+    badges: ["Official", "New"],
+    installMethods: ["web"],
+  },
+  {
+    id: "tft-session-library",
+    slug: "session-library",
+    name: "Session Library",
+    description:
+      "Search 350+ ready-to-use training sessions across ball mastery, 1v1s, finishing, tactical scenarios, SSGs, and more.",
+    longDescription:
+      "Browse and search over 350 ready-to-use training sessions from the 360TFT Session Plan collection. Sessions cover ball mastery, 1v1 attacking and defending, finishing, technical skills, tactical scenarios, small-sided games, possession, and rondos.\n\nEach session pack is designed for real coaching sessions with clear setup instructions, coaching points, and progressions. Find the right session for your next training session in seconds.",
+    category: "coaching",
+    iconEmoji: "\uD83D\uDCCB",
+    authorName: "Coach Kevin",
+    authorType: "official",
+    mcpServerPath: "local",
+    mcpToolName: "search_sessions",
+    pricingType: "freemium",
+    productUrl: "https://360tft.co.uk",
+    isPublished: true,
+    installCount: 0,
+    exampleQueries: [
+      "Ball mastery sessions for U10s",
+      "1v1 defending drills",
+      "Finishing sessions for strikers",
+      "Rondo and possession activities",
+    ],
+    inputParams: [
+      {
+        name: "query",
+        description: "What type of session you are looking for",
+        required: true,
+      },
+    ],
+    avgRating: 0,
+    reviewCount: 0,
+    badges: ["Official", "New"],
+    installMethods: ["web"],
+  },
+  {
+    id: "tft-cheat-sheets",
+    slug: "cheat-sheets",
+    name: "AI Coaching Cheat Sheets",
+    description:
+      "Free AI prompt guides for football coaches, players, referees, and analysts. Get the best results from AI tools.",
+    longDescription:
+      "Search free AI prompt guides covering football coaching, tactical analysis, player development, referee preparation, and individual development plans. Each cheat sheet includes ready-to-use prompts, the CRAFT framework for writing effective prompts, and practical examples.\n\nThese guides help coaches get better results from AI tools like FootballGPT, ChatGPT, and Claude. No signup required — completely free.",
+    category: "coaching",
+    iconEmoji: "\uD83D\uDCA1",
+    authorName: "Coach Kevin",
+    authorType: "official",
+    mcpServerPath: "local",
+    mcpToolName: "search_cheatsheets",
+    pricingType: "free",
+    productUrl: "https://360tft.co.uk",
+    isPublished: true,
+    installCount: 0,
+    exampleQueries: [
+      "How do I write a good prompt for session planning?",
+      "AI prompts for tactical analysis",
+      "Player development plan prompts",
+      "What is the CRAFT framework?",
+    ],
+    inputParams: [
+      {
+        name: "query",
+        description: "What AI coaching topic you need help with",
+        required: true,
+      },
+    ],
+    avgRating: 0,
+    reviewCount: 0,
+    badges: ["Official", "Free", "New"],
+    installMethods: ["web"],
+  },
+
   // ===== CoachReflect (3 tools) =====
   {
     id: "cr-log-reflection",
