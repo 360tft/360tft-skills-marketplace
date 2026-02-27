@@ -11,6 +11,13 @@ const PRODUCT_URLS: Record<string, string> = {
   coachreflect: "https://coachreflection.com",
 };
 
+// Product display names for branding
+const PRODUCT_NAMES: Record<string, string> = {
+  footballgpt: "FootballGPT",
+  refereegpt: "RefereeGPT",
+  coachreflect: "CoachReflect",
+};
+
 // Map MCP tool names to product API action paths
 const TOOL_TO_ACTION: Record<string, string> = {
   // FootballGPT
@@ -163,12 +170,16 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     const result = data.text || data.result || data.content || JSON.stringify(data);
+    const productName = PRODUCT_NAMES[mcpServerPath] || mcpServerPath;
 
     // Log activity (non-blocking)
     logActivity(req, action, query).catch(() => {});
 
     return NextResponse.json(
-      { result },
+      {
+        result,
+        poweredBy: { name: productName, url: productUrl },
+      },
       { headers: { "X-RateLimit-Remaining": String(remaining) } }
     );
   } catch (err) {

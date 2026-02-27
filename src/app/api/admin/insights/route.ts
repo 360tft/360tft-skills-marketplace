@@ -144,6 +144,51 @@ export async function GET(req: NextRequest) {
         suggestion: `Users are asking about "${t.topic}" ${t.count} times this week. Consider a dedicated tool.`,
       }));
 
+    // Conversion funnel: try → install → signup → API key
+    const { data: installData } = await db
+      .from("user_activity")
+      .select("id")
+      .eq("action", "install")
+      .gte("created_at", weekAgoISO);
+
+    const { data: signupData } = await db
+      .from("profiles")
+      .select("id")
+      .gte("created_at", weekAgoISO);
+
+    const { data: apiKeyData } = await db
+      .from("api_keys")
+      .select("id")
+      .gte("created_at", weekAgoISO);
+
+    const tryCount = (toolTriesData || []).length;
+    const installCount = (installData || []).length;
+    const signupCount = (signupData || []).length;
+    const apiKeyCount = (apiKeyData || []).length;
+
+    // Per-tool conversion (tries → installs)
+    const installCounts: Record<string, number> = {};
+    const { data: installByTool } = await db
+      .from("user_activity")
+      .select("tool_slug")
+      .eq("action", "install")
+      .gte("created_at", weekAgoISO);
+
+    for (const row of installByTool || []) {
+      if (row.tool_slug) {
+        installCounts[row.tool_slug] = (installCounts[row.tool_slug] || 0) + 1;
+      }
+    }
+
+    const toolConversion = Object.entries(toolTrieCounts)
+      .map(([slug, tries]) => ({
+        slug,
+        tries,
+        installs: installCounts[slug] || 0,
+        rate: tries > 0 ? Math.round(((installCounts[slug] || 0) / tries) * 100) : 0,
+      }))
+      .sort((a, b) => b.tries - a.tries);
+
     return NextResponse.json({
       topTopics,
       topQueries,
@@ -156,6 +201,13 @@ export async function GET(req: NextRequest) {
         rate: retentionRate,
       },
       contentOpportunities,
+      conversionFunnel: {
+        tries: tryCount,
+        installs: installCount,
+        signups: signupCount,
+        apiKeys: apiKeyCount,
+      },
+      toolConversion,
     });
   } catch (error) {
     return NextResponse.json(

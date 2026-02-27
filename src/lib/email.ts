@@ -210,6 +210,107 @@ export async function sendRateLimitWarning(
   );
 }
 
+// Product-specific install nurture emails
+const PRODUCT_NURTURE: Record<
+  string,
+  { subject: string; productName: string; productUrl: string; tips: string[] }
+> = {
+  footballgpt: {
+    subject: "Your FootballGPT tools are ready",
+    productName: "FootballGPT",
+    productUrl: "https://footballgpt.co",
+    tips: [
+      "Ask for session plans with specific age groups and topics for the best results",
+      "Try the Animated Drill Creator to turn text into visual drill diagrams",
+      "Use Player Stats Search to look up real stats from 100+ leagues",
+      "The Drill Library has community-contributed exercises you can filter by topic",
+    ],
+  },
+  refereegpt: {
+    subject: "Your RefereeGPT tools are ready",
+    productName: "RefereeGPT",
+    productUrl: "https://refereegpt.co",
+    tips: [
+      "Ask about specific match situations for accurate law references",
+      "Use the Quiz Generator to practise for referee exams",
+      "The Incident Analyzer gives you specific IFAB law numbers and clauses",
+      "Specify your country for local rule variations (9 countries supported)",
+    ],
+  },
+  coachreflect: {
+    subject: "Your CoachReflect tools are ready",
+    productName: "CoachReflect",
+    productUrl: "https://coachreflection.com",
+    tips: [
+      "Log a reflection after every session to build your coaching journal",
+      "After 5+ reflections, use Pattern Finder to see themes in your coaching",
+      "Try the Journal Chat to ask questions about your own development",
+      "Include your mood and energy level for richer pattern analysis",
+    ],
+  },
+};
+
+export async function sendInstallNurtureEmail(
+  email: string,
+  toolSlug: string
+) {
+  // Map tool slugs to product keys
+  const productMap: Record<string, string> = {
+    "coaching-advice": "footballgpt",
+    "session-plan-generator": "footballgpt",
+    "animated-drill-creator": "footballgpt",
+    "player-stats-search": "footballgpt",
+    "drill-library-search": "footballgpt",
+    "law-lookup": "refereegpt",
+    "incident-analyzer": "refereegpt",
+    "referee-quiz": "refereegpt",
+    "coaching-reflection": "coachreflect",
+    "coaching-patterns": "coachreflect",
+    "coaching-journal-chat": "coachreflect",
+  };
+
+  const productKey = productMap[toolSlug];
+  if (!productKey) return;
+
+  const nurture = PRODUCT_NURTURE[productKey];
+  if (!nurture) return;
+
+  const tipsList = nurture.tips
+    .map(
+      (tip) =>
+        `<li style="color: #aaa; margin-bottom: 8px; line-height: 1.5;">${tip}</li>`
+    )
+    .join("");
+
+  await send(
+    email,
+    nurture.subject,
+    `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #fff;">You've installed ${nurture.productName}</h2>
+      <p style="color: #aaa; line-height: 1.6;">
+        Great choice. Here are some tips to get the most out of it:
+      </p>
+      <ul style="padding-left: 16px; margin: 16px 0;">
+        ${tipsList}
+      </ul>
+      <p style="color: #aaa; line-height: 1.6;">
+        These tools work best inside Claude Desktop. If you haven't set it up yet, follow the
+        <a href="https://aifootball.co/docs/claude-desktop" style="color: #16a34a;">setup guide</a>.
+      </p>
+      <p style="margin-top: 24px;">
+        <a href="${nurture.productUrl}" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Open ${nurture.productName}
+        </a>
+      </p>
+      <p style="color: #666; font-size: 12px; margin-top: 32px;">
+        AI Football — The AI agent marketplace for football
+      </p>
+    </div>
+    `
+  );
+}
+
 export async function notifyNewSignup(email: string) {
   await send(
     getAdminEmail(),

@@ -6,11 +6,38 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CATEGORIES } from "@/data/tools";
 
+type ToolType = "mcp_server" | "api" | "claude_skill" | "custom_gpt";
+
+const TOOL_TYPES: { value: ToolType; label: string; description: string }[] = [
+  {
+    value: "mcp_server",
+    label: "MCP Server",
+    description: "A Model Context Protocol server that works with Claude Desktop",
+  },
+  {
+    value: "api",
+    label: "API / Web App",
+    description: "A REST API or web application with football AI features",
+  },
+  {
+    value: "claude_skill",
+    label: "Claude Skill",
+    description: "A Claude Code skill file (.md) with prompts and instructions",
+  },
+  {
+    value: "custom_gpt",
+    label: "Custom GPT",
+    description: "A Custom GPT built on OpenAI's GPT Store",
+  },
+];
+
 export default function SubmitPage() {
   const [form, setForm] = useState({
     name: "",
     description: "",
     category: "",
+    toolType: "" as ToolType | "",
+    connectionUrl: "",
     mcpUrl: "",
     apiDocsUrl: "",
     email: "",
@@ -44,6 +71,36 @@ export default function SubmitPage() {
     }
   };
 
+  const connectionPlaceholder = (): string => {
+    switch (form.toolType) {
+      case "mcp_server":
+        return "https://your-server.com/mcp";
+      case "api":
+        return "https://your-api.com";
+      case "claude_skill":
+        return "https://github.com/you/skill-repo";
+      case "custom_gpt":
+        return "https://chatgpt.com/g/g-xxxxx";
+      default:
+        return "https://...";
+    }
+  };
+
+  const connectionLabel = (): string => {
+    switch (form.toolType) {
+      case "mcp_server":
+        return "MCP server URL";
+      case "api":
+        return "API base URL or website";
+      case "claude_skill":
+        return "Skill file URL (GitHub or direct link)";
+      case "custom_gpt":
+        return "GPT Store URL";
+      default:
+        return "Connection URL";
+    }
+  };
+
   return (
     <>
       <Header />
@@ -64,9 +121,9 @@ export default function SubmitPage() {
           List Your Football AI Tool
         </h1>
         <p className="text-[var(--muted-foreground)] mb-8 leading-relaxed">
-          Built a football AI tool? List it on AI Football for free. We review
-          every submission and add approved tools to the marketplace. No fees,
-          no catch.
+          Built a football AI tool? List it on AI Football for free. We accept
+          MCP servers, APIs, Claude skills, and Custom GPTs. We review every
+          submission and add approved tools to the directory.
         </p>
 
         {submitted ? (
@@ -102,6 +159,42 @@ export default function SubmitPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Tool type selector */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+                Tool type *
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {TOOL_TYPES.map((t) => (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() =>
+                      setForm({ ...form, toolType: t.value })
+                    }
+                    className={`text-left p-3 rounded-lg border text-sm transition-colors ${
+                      form.toolType === t.value
+                        ? "border-[var(--accent)] bg-[var(--accent)]/10"
+                        : "border-[var(--border)] hover:border-[var(--accent)]/30"
+                    }`}
+                  >
+                    <span
+                      className={`font-medium block ${
+                        form.toolType === t.value
+                          ? "text-[var(--accent)]"
+                          : "text-[var(--foreground)]"
+                      }`}
+                    >
+                      {t.label}
+                    </span>
+                    <span className="text-xs text-[var(--muted)] mt-0.5 block">
+                      {t.description}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
                 Tool name *
@@ -151,37 +244,42 @@ export default function SubmitPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
-                MCP server URL
-              </label>
-              <input
-                type="url"
-                value={form.mcpUrl}
-                onChange={(e) => setForm({ ...form, mcpUrl: e.target.value })}
-                placeholder="https://your-server.com/mcp"
-                className="w-full px-3 py-2 rounded-lg bg-[var(--background)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]/50"
-              />
-              <p className="text-xs text-[var(--muted)] mt-1">
-                If your tool uses MCP, provide the server URL. Otherwise leave
-                blank.
-              </p>
-            </div>
+            {/* Connection URL - shown when tool type is selected */}
+            {form.toolType && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
+                  {connectionLabel()} *
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={form.connectionUrl}
+                  onChange={(e) =>
+                    setForm({ ...form, connectionUrl: e.target.value })
+                  }
+                  placeholder={connectionPlaceholder()}
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--background)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]/50"
+                />
+              </div>
+            )}
 
-            <div>
-              <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
-                API docs or website URL
-              </label>
-              <input
-                type="url"
-                value={form.apiDocsUrl}
-                onChange={(e) =>
-                  setForm({ ...form, apiDocsUrl: e.target.value })
-                }
-                placeholder="https://your-tool.com/docs"
-                className="w-full px-3 py-2 rounded-lg bg-[var(--background)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]/50"
-              />
-            </div>
+            {/* API docs URL - only for API type */}
+            {form.toolType === "api" && (
+              <div>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
+                  API documentation URL
+                </label>
+                <input
+                  type="url"
+                  value={form.apiDocsUrl}
+                  onChange={(e) =>
+                    setForm({ ...form, apiDocsUrl: e.target.value })
+                  }
+                  placeholder="https://your-tool.com/docs"
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--background)] border border-[var(--border)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[var(--accent)]/50"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-[var(--foreground)] mb-1.5">
@@ -206,15 +304,15 @@ export default function SubmitPage() {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !form.toolType}
               className="w-full py-2.5 rounded-lg bg-[var(--accent)] text-black font-medium text-sm hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
             >
               {submitting ? "Submitting..." : "Submit for review"}
             </button>
 
             <p className="text-xs text-[var(--muted)] text-center">
-              Listings are free. We review submissions manually and aim to
-              respond within a few days. Want to build a tool from scratch?{" "}
+              Listings are free. We review submissions and aim to respond within
+              a few days. Want to build a tool from scratch?{" "}
               <a
                 href="https://www.skool.com/aifootball"
                 target="_blank"

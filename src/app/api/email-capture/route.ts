@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { sendInstallNurtureEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,6 +51,14 @@ export async function POST(req: NextRequest) {
       } catch {
         // Non-critical
       }
+    }
+
+    // Send product-specific nurture email (non-blocking)
+    if (sourceTool) {
+      sendInstallNurtureEmail(
+        email.toLowerCase().trim(),
+        sourceTool
+      ).catch(() => {});
     }
 
     return NextResponse.json({ success: true, stored: true });

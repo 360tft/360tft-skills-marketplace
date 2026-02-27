@@ -32,6 +32,20 @@ interface ContentOpp {
   suggestion: string;
 }
 
+interface FunnelData {
+  tries: number;
+  installs: number;
+  signups: number;
+  apiKeys: number;
+}
+
+interface ToolConversionRow {
+  slug: string;
+  tries: number;
+  installs: number;
+  rate: number;
+}
+
 interface InsightsData {
   topTopics: TopicData[];
   topQueries: QueryData[];
@@ -44,6 +58,8 @@ interface InsightsData {
     rate: number | null;
   };
   contentOpportunities: ContentOpp[];
+  conversionFunnel?: FunnelData;
+  toolConversion?: ToolConversionRow[];
 }
 
 export default function InsightsPage() {
@@ -199,6 +215,95 @@ export default function InsightsPage() {
                 </p>
               </div>
             </div>
+
+            {/* Conversion funnel */}
+            {data.conversionFunnel && (
+              <div>
+                <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3">
+                  Conversion funnel (7 days)
+                </h2>
+                <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+                  <div className="space-y-3">
+                    {[
+                      { label: "Try it demos", value: data.conversionFunnel.tries, color: "var(--accent)" },
+                      { label: "Tool installs", value: data.conversionFunnel.installs, color: "#3b82f6" },
+                      { label: "Account signups", value: data.conversionFunnel.signups, color: "#8b5cf6" },
+                      { label: "API keys created", value: data.conversionFunnel.apiKeys, color: "#f59e0b" },
+                    ].map((step, i) => {
+                      const maxVal = data.conversionFunnel!.tries || 1;
+                      const pct = Math.round((step.value / maxVal) * 100);
+                      return (
+                        <div key={step.label}>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-[var(--muted-foreground)]">
+                              {step.label}
+                            </span>
+                            <span className="font-mono text-[var(--foreground)]">
+                              {step.value}
+                              {i > 0 && (
+                                <span className="text-xs text-[var(--muted)] ml-1.5">
+                                  ({pct}%)
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="h-2 bg-[var(--border)] rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{
+                                width: `${Math.max(pct, 2)}%`,
+                                backgroundColor: step.color,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Per-tool conversion */}
+            {data.toolConversion && data.toolConversion.length > 0 && (
+              <div>
+                <h2 className="text-lg font-semibold text-[var(--foreground)] mb-3">
+                  Try-to-install conversion by tool
+                </h2>
+                <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[var(--border)]">
+                        <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">Tool</th>
+                        <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">Tries</th>
+                        <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">Installs</th>
+                        <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">Conv. rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.toolConversion.map((t) => (
+                        <tr key={t.slug} className="border-b border-[var(--border)] last:border-0">
+                          <td className="px-4 py-2.5 text-[var(--foreground)]">
+                            {t.slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-[var(--muted-foreground)]">
+                            {t.tries}
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono text-[var(--muted-foreground)]">
+                            {t.installs}
+                          </td>
+                          <td className="px-4 py-2.5 text-right font-mono">
+                            <span className={t.rate >= 20 ? "text-green-400" : t.rate >= 5 ? "text-yellow-400" : "text-[var(--muted)]"}>
+                              {t.rate}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Topic trends */}
             <div>

@@ -43,6 +43,17 @@ const guides = [
       </svg>
     ),
   },
+  {
+    title: "Submission Guidelines",
+    description:
+      "What we accept, how the review process works, and tips for getting your football AI tool listed.",
+    href: "/docs/submit",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
 ];
 
 export default function DocsPage() {
