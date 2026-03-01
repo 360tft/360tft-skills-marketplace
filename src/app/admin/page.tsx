@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { ShareableStats } from "@/components/shareable-stats";
 import { getPublishedTools } from "@/data/tools";
 
 interface Submission {
@@ -16,6 +17,10 @@ interface Submission {
   status: string;
   admin_notes: string | null;
   created_at: string;
+  rubric_score: number | null;
+  rubric_flags: string[] | null;
+  risk_score: number | null;
+  risk_flags: string[] | null;
 }
 
 interface Stats {
@@ -57,11 +62,85 @@ interface KeyRow {
   created_at: string;
 }
 
+const RISK_COLOURS: Record<string, { bg: string; text: string }> = {
+  low: { bg: "bg-green-900/30", text: "text-green-400" },
+  medium: { bg: "bg-yellow-900/30", text: "text-yellow-400" },
+  high: { bg: "bg-orange-900/30", text: "text-orange-400" },
+  critical: { bg: "bg-red-900/30", text: "text-red-400" },
+};
+
+function getRiskLevel(score: number): string {
+  if (score <= 25) return "low";
+  if (score <= 50) return "medium";
+  if (score <= 75) return "high";
+  return "critical";
+}
+
+function RiskBadge({ score }: { score: number | null }) {
+  if (score === null || score === undefined) return null;
+  const level = getRiskLevel(score);
+  const colours = RISK_COLOURS[level];
+  return (
+    <span className={`text-xs px-1.5 py-0.5 rounded ${colours.bg} ${colours.text}`}>
+      Risk: {level.charAt(0).toUpperCase() + level.slice(1)} ({score})
+    </span>
+  );
+}
+
+function QualityBadge({ score }: { score: number | null }) {
+  if (score === null || score === undefined) return null;
+  const bg = score >= 70 ? "bg-green-900/30" : score >= 40 ? "bg-yellow-900/30" : "bg-red-900/30";
+  const text = score >= 70 ? "text-green-400" : score >= 40 ? "text-yellow-400" : "text-red-400";
+  return (
+    <span className={`text-xs px-1.5 py-0.5 rounded ${bg} ${text}`}>
+      Quality: {score}
+    </span>
+  );
+}
+
+function FlagsList({ flags }: { flags: string[] | null }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!flags || flags.length === 0) return null;
+
+  // Parse flag format: "prefix:+N description"
+  const parsed = flags.map((f) => {
+    const colonIdx = f.indexOf(":");
+    if (colonIdx === -1) return { label: f, detail: "" };
+    const prefix = f.slice(0, colonIdx);
+    const rest = f.slice(colonIdx + 1).replace(/^[+-]\d+\s*/, "");
+    return { label: prefix.replace(/_/g, " "), detail: rest };
+  });
+
+  return (
+    <div className="mt-1.5">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-[10px] text-[var(--muted)] hover:text-[var(--muted-foreground)] transition-colors"
+      >
+        {expanded ? "Hide" : "Show"} {flags.length} flag{flags.length !== 1 ? "s" : ""}
+      </button>
+      {expanded && (
+        <ul className="mt-1 space-y-0.5">
+          {parsed.map((f, i) => (
+            <li key={i} className="text-[11px] text-[var(--muted-foreground)]">
+              <span className="text-[var(--foreground)] font-medium">{f.label}</span>
+              {f.detail && <span className="ml-1">{f.detail}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 const TIER_COLOURS: Record<string, string> = {
   free: "#737373",
   pro: "#16a34a",
-  developer: "#e5a11c",
+  builder: "#e5a11c",
+  scale: "#3b82f6",
+  enterprise: "#f59e0b",
   unlimited: "#a855f7",
+  developer: "#e5a11c",
 };
 
 const PRODUCT_LABELS: Record<string, string> = {
@@ -70,6 +149,7 @@ const PRODUCT_LABELS: Record<string, string> = {
   refereegpt: "RefereeGPT",
   cruisegpt: "CruiseGPT",
   coachreflect: "CoachReflect",
+  playerreflection: "PlayerReflection",
 };
 
 function StatCard({
@@ -910,9 +990,13 @@ export default function AdminPage() {
                 <div key={sub.id} className="p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-[var(--foreground)]">
-                        {sub.name}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium text-[var(--foreground)]">
+                          {sub.name}
+                        </p>
+                        <RiskBadge score={sub.risk_score} />
+                        <QualityBadge score={sub.rubric_score} />
+                      </div>
                       <p className="text-sm text-[var(--muted-foreground)] mt-0.5">
                         {sub.description}
                       </p>
@@ -947,6 +1031,14 @@ export default function AdminPage() {
                           })}
                         </span>
                       </div>
+                      {(sub.risk_flags?.length || sub.rubric_flags?.length) ? (
+                        <FlagsList
+                          flags={[
+                            ...(sub.risk_flags || []),
+                            ...(sub.rubric_flags || []).map((f: string) => `rubric:+0 ${f.replace(/_/g, " ")}`),
+                          ]}
+                        />
+                      ) : null}
                     </div>
                     {sub.status === "pending" && (
                       <div className="flex gap-2 shrink-0">
@@ -1063,6 +1155,11 @@ export default function AdminPage() {
             ))}
           </div>
         </div>
+
+        {/* Shareable Stats Cards */}
+        {stats && (
+          <ShareableStats stats={stats} toolCount={allTools.length} />
+        )}
       </main>
       <Footer />
     </>

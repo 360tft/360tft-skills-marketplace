@@ -4,7 +4,11 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   sendSponsorshipConfirmation,
   sendSponsorshipCancelled,
+  sendDeveloperTierConfirmation,
+  sendDeveloperTierCancelled,
+  sendRateLimitWarning,
 } from "@/lib/email";
+import { TIER_LIMITS } from "@/lib/api-keys";
 import type Stripe from "stripe";
 
 export async function POST(request: NextRequest) {
@@ -43,6 +47,31 @@ export async function POST(request: NextRequest) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      // Developer tier upgrade
+      if (session.metadata?.type === "developer_tier") {
+        const devTier = session.metadata.tier;
+        const userEmail = session.metadata.user_email;
+
+        if (devTier && userEmail) {
+          await admin
+            .from("api_keys")
+            .update({
+              tier: devTier,
+              stripe_subscription_id: session.subscription as string,
+              stripe_customer_id: session.customer as string,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("email", userEmail)
+            .eq("is_active", true);
+
+          const limit = TIER_LIMITS[devTier] || 1000;
+          sendDeveloperTierConfirmation(userEmail, devTier, limit).catch(() => {});
+        }
+        break;
+      }
+
+      // Sponsorship checkout
       const { tool_slug, tier, user_id } = session.metadata || {};
 
       if (!tool_slug || !tier || !user_id) break;
@@ -71,6 +100,29 @@ export async function POST(request: NextRequest) {
       const subscription = event.data.object as Stripe.Subscription;
       const status = subscription.status;
 
+      // Check if this is a developer tier subscription
+      const { data: devKeys } = await admin
+        .from("api_keys")
+        .select("id")
+        .eq("stripe_subscription_id", subscription.id)
+        .limit(1);
+
+      if (devKeys && devKeys.length > 0) {
+        if (status === "canceled" || status === "unpaid") {
+          await admin
+            .from("api_keys")
+            .update({
+              tier: "free",
+              stripe_subscription_id: null,
+              stripe_customer_id: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("stripe_subscription_id", subscription.id);
+        }
+        break;
+      }
+
+      // Sponsorship subscription
       let mappedStatus: string;
       if (status === "active") mappedStatus = "active";
       else if (status === "past_due") mappedStatus = "past_due";
@@ -88,6 +140,34 @@ export async function POST(request: NextRequest) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
 
+      // Check if this is a developer tier subscription
+      const { data: devKeysToCancel } = await admin
+        .from("api_keys")
+        .select("id, email, tier")
+        .eq("stripe_subscription_id", subscription.id)
+        .limit(1);
+
+      if (devKeysToCancel && devKeysToCancel.length > 0) {
+        const cancelledTier = devKeysToCancel[0].tier;
+        const cancelledEmail = devKeysToCancel[0].email;
+
+        await admin
+          .from("api_keys")
+          .update({
+            tier: "free",
+            stripe_subscription_id: null,
+            stripe_customer_id: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", subscription.id);
+
+        if (cancelledEmail) {
+          sendDeveloperTierCancelled(cancelledEmail, cancelledTier).catch(() => {});
+        }
+        break;
+      }
+
+      // Sponsorship subscription
       const { data: listing } = await admin
         .from("sponsored_listings")
         .select("tool_slug, tier")
@@ -128,6 +208,21 @@ export async function POST(request: NextRequest) {
           : subDetails?.subscription?.id ?? null;
 
       if (subId) {
+        // Check if this is a developer tier subscription
+        const { data: failedDevKeys } = await admin
+          .from("api_keys")
+          .select("id, email")
+          .eq("stripe_subscription_id", subId)
+          .limit(1);
+
+        if (failedDevKeys && failedDevKeys.length > 0) {
+          if (failedDevKeys[0].email) {
+            const limit = TIER_LIMITS["builder"] || 1000;
+            sendRateLimitWarning(failedDevKeys[0].email, limit, limit).catch(() => {});
+          }
+          break;
+        }
+
         await admin
           .from("sponsored_listings")
           .update({

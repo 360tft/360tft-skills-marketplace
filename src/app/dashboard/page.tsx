@@ -39,6 +39,8 @@ interface Favourite {
   created_at: string;
 }
 
+type DashboardMode = "coach" | "developer";
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -48,6 +50,19 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState("");
+  const [mode, setMode] = useState<DashboardMode>("coach");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("dashboard-mode");
+    if (stored === "coach" || stored === "developer") {
+      setMode(stored);
+    }
+  }, []);
+
+  const handleModeChange = (newMode: DashboardMode) => {
+    setMode(newMode);
+    localStorage.setItem("dashboard-mode", newMode);
+  };
 
   const loadData = useCallback(async () => {
     const supabase = createClient();
@@ -193,43 +208,71 @@ export default function DashboardPage() {
                 )}
               </p>
             </div>
-            {(profile?.role === "creator" || profile?.role === "admin") && (
-              <Link
-                href="/dashboard/creator"
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
-              >
-                Creator dashboard
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-0.5 bg-[var(--card)] border border-[var(--border)] rounded-lg p-0.5">
+                <button
+                  onClick={() => handleModeChange("coach")}
+                  className={`text-xs px-3 py-1 rounded-md transition-colors ${
+                    mode === "coach"
+                      ? "bg-[var(--accent)] text-black font-medium"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  Coach
+                </button>
+                <button
+                  onClick={() => handleModeChange("developer")}
+                  className={`text-xs px-3 py-1 rounded-md transition-colors ${
+                    mode === "developer"
+                      ? "bg-[var(--accent)] text-black font-medium"
+                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  Developer
+                </button>
+              </div>
+              {(profile?.role === "creator" || profile?.role === "admin") && (
+                <Link
+                  href="/dashboard/creator"
+                  className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+                >
+                  Creator dashboard
+                </Link>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Quick stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className={`grid gap-4 mb-8 ${mode === "developer" ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-2"}`}>
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-2xl font-bold text-[var(--foreground)]">
               {stats.toolsTried}
             </p>
             <p className="text-xs text-[var(--muted)]">Tools tried</p>
           </div>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
-            <p className="text-2xl font-bold text-[var(--foreground)]">
-              {stats.apiCallsMonth}
-            </p>
-            <p className="text-xs text-[var(--muted)]">API calls this month</p>
-          </div>
+          {mode === "developer" && (
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
+              <p className="text-2xl font-bold text-[var(--foreground)]">
+                {stats.apiCallsMonth}
+              </p>
+              <p className="text-xs text-[var(--muted)]">API calls this month</p>
+            </div>
+          )}
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
             <p className="text-2xl font-bold text-[var(--foreground)]">
               {stats.favouriteCount}
             </p>
             <p className="text-xs text-[var(--muted)]">Favourites</p>
           </div>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
-            <p className="text-2xl font-bold text-[var(--foreground)]">
-              {apiKeys.length}
-            </p>
-            <p className="text-xs text-[var(--muted)]">API keys</p>
-          </div>
+          {mode === "developer" && (
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
+              <p className="text-2xl font-bold text-[var(--foreground)]">
+                {apiKeys.length}
+              </p>
+              <p className="text-xs text-[var(--muted)]">API keys</p>
+            </div>
+          )}
         </div>
 
         {/* Favourites */}
@@ -254,75 +297,92 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* API Keys */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[var(--foreground)]">
-              API keys
-            </h2>
-            <Link
-              href="/developer"
-              className="text-sm text-[var(--accent)] hover:underline"
-            >
-              Manage keys
-            </Link>
-          </div>
-          {apiKeys.length === 0 ? (
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-center">
-              <p className="text-sm text-[var(--muted-foreground)] mb-3">
-                No API keys yet.
-              </p>
+        {/* API Keys (developer mode only) */}
+        {mode === "developer" && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-[var(--foreground)]">
+                API keys
+              </h2>
               <Link
                 href="/developer"
                 className="text-sm text-[var(--accent)] hover:underline"
               >
-                Create your first API key
+                Manage keys
               </Link>
             </div>
-          ) : (
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--border)]">
-                    <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">
-                      Name
-                    </th>
-                    <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">
-                      Key
-                    </th>
-                    <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium hidden sm:table-cell">
-                      Tier
-                    </th>
-                    <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">
-                      Today
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {apiKeys.map((key) => (
-                    <tr
-                      key={key.id}
-                      className="border-b border-[var(--border)] last:border-0"
-                    >
-                      <td className="px-4 py-2.5 text-[var(--foreground)]">
-                        {key.name}
-                      </td>
-                      <td className="px-4 py-2.5 font-mono text-xs text-[var(--muted-foreground)]">
-                        {key.key_prefix}...
-                      </td>
-                      <td className="px-4 py-2.5 text-[var(--muted-foreground)] hidden sm:table-cell capitalize">
-                        {key.tier}
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-[var(--foreground)]">
-                        {key.calls_today}
-                      </td>
+            {apiKeys.length === 0 ? (
+              <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-center">
+                <p className="text-sm text-[var(--muted-foreground)] mb-3">
+                  No API keys yet.
+                </p>
+                <Link
+                  href="/developer"
+                  className="text-sm text-[var(--accent)] hover:underline"
+                >
+                  Create your first API key
+                </Link>
+              </div>
+            ) : (
+              <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--border)]">
+                      <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">
+                        Name
+                      </th>
+                      <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium">
+                        Key
+                      </th>
+                      <th className="text-left px-4 py-2.5 text-[var(--muted)] font-medium hidden sm:table-cell">
+                        Tier
+                      </th>
+                      <th className="text-right px-4 py-2.5 text-[var(--muted)] font-medium">
+                        Today
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {apiKeys.map((key) => (
+                      <tr
+                        key={key.id}
+                        className="border-b border-[var(--border)] last:border-0"
+                      >
+                        <td className="px-4 py-2.5 text-[var(--foreground)]">
+                          {key.name}
+                        </td>
+                        <td className="px-4 py-2.5 font-mono text-xs text-[var(--muted-foreground)]">
+                          {key.key_prefix}...
+                        </td>
+                        <td className="px-4 py-2.5 text-[var(--muted-foreground)] hidden sm:table-cell capitalize">
+                          {key.tier}
+                        </td>
+                        <td className="px-4 py-2.5 text-right text-[var(--foreground)]">
+                          {key.calls_today}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Browse more tools (coach mode) */}
+        {mode === "coach" && favourites.length === 0 && activity.length === 0 && (
+          <div className="mb-8 bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-center">
+            <p className="text-sm text-[var(--muted-foreground)] mb-3">
+              Start by browsing the tools and trying a few out.
+            </p>
+            <Link
+              href="/"
+              className="text-sm font-medium text-[var(--accent)] hover:underline"
+            >
+              Browse tools
+            </Link>
+          </div>
+        )}
 
         {/* Recent activity */}
         <div className="mb-8">

@@ -145,7 +145,8 @@ export async function POST(req: NextRequest) {
             {
               error: "Rate limit exceeded",
               message:
-                "You have used all your free tries today. Install this tool or subscribe for unlimited access.",
+                "You've used your 2 free tries today. Get unlimited access on 360TFT.",
+              product: { name: "360TFT", url: "https://360tft.co.uk" },
             },
             { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
           );
@@ -177,11 +178,13 @@ export async function POST(req: NextRequest) {
       RATE_LIMITS.TRY_TOOL
     );
     if (!allowed) {
+      const productName = PRODUCT_NAMES[mcpServerPath] || mcpServerPath;
+      const productUrl = PRODUCT_URLS[mcpServerPath] || "";
       return NextResponse.json(
         {
           error: "Rate limit exceeded",
-          message:
-            "You have used all your free tries today. Install this tool or subscribe for unlimited access.",
+          message: `You've used your 2 free tries today. Get unlimited access on ${productName}.`,
+          product: { name: productName, url: productUrl },
         },
         { status: 429, headers: { "X-RateLimit-Remaining": "0" } }
       );

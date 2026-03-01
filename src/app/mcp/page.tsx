@@ -4,14 +4,14 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "Football MCP Servers",
+  title: "Add Football AI to Claude Desktop",
   description:
-    "Model Context Protocol (MCP) servers for football coaching, refereeing, and scouting. Install football AI tools into Claude Desktop and other MCP-compatible clients.",
+    "Plan sessions, check laws, animate drills, and reflect on your coaching — all from your AI assistant. Set up in under 2 minutes.",
   keywords: [
     "football MCP",
-    "MCP tools for coaching",
+    "football AI Claude Desktop",
     "football MCP server",
-    "Model Context Protocol football",
+    "AI coaching tools",
     "MCP football coaching",
   ],
 };
@@ -20,8 +20,9 @@ const servers = [
   {
     name: "FootballGPT",
     path: "footballgpt",
+    tagline: "Your coaching assistant inside Claude",
     description:
-      "5 tools covering coaching advice from 18 specialist advisors, session plan generation, animated drill creation, player stats from 100+ leagues, and drill library search.",
+      "Ask for a session plan and get one. Ask for coaching advice from 18 specialist advisors. Generate animated drills, search player stats across 100+ leagues, or browse a drill library. All from your AI assistant.",
     tools: [
       "get_coaching_advice",
       "generate_session_plan",
@@ -34,16 +35,18 @@ const servers = [
   {
     name: "RefereeGPT",
     path: "refereegpt",
+    tagline: "Law of the Game at your fingertips",
     description:
-      "3 tools for referee education. Look up any Law of the Game with RAG, analyse match incidents with law references, and generate training quizzes at any difficulty.",
+      "Ask Claude about any law and get the exact wording with references. Describe a match incident and get a ruling. Generate quizzes at any difficulty for referee training sessions.",
     tools: ["check_law", "analyze_incident", "generate_quiz"],
     productUrl: "https://refereegpt.co",
   },
   {
     name: "CoachReflect",
     path: "coachreflect",
+    tagline: "Reflect on your coaching, conversationally",
     description:
-      "3 tools for coaching development. Log session reflections, find patterns across your coaching history, and chat with your reflection journal.",
+      "Log a session reflection straight from Claude. Ask what patterns are showing up in your coaching. Chat with your reflection journal to spot trends you might have missed.",
     tools: ["log_reflection", "get_patterns", "coaching_chat"],
     productUrl: "https://coachreflection.com",
   },
@@ -67,22 +70,108 @@ export default function McpPage() {
         </nav>
 
         {/* Hero */}
-        <div className="mb-10">
+        <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-[var(--foreground)] mb-3">
-            Football MCP Servers
+            Add Football AI to Your AI Assistant
           </h1>
-          <p className="text-[var(--muted-foreground)] max-w-2xl leading-relaxed">
-            Model Context Protocol (MCP) lets AI assistants discover and use
-            external tools. AI Football runs 3 MCP servers with 11 football
-            tools that work with Claude Desktop, OpenClaw, and any
-            MCP-compatible client.
+          <p className="text-[var(--muted-foreground)] max-w-2xl leading-relaxed mb-5">
+            Plan sessions, check laws, animate drills, and reflect on your
+            coaching — all from your AI assistant. 11 tools, 3 servers. Free
+            to start.
           </p>
+
+          {/* Entry points — MCP vs OpenClaw vs Web */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <Link
+              href="#mcp-setup"
+              className="bg-[var(--card)] border border-[var(--accent)]/30 rounded-xl p-4 hover:border-[var(--accent)]/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
+                <span className="text-sm font-medium text-[var(--foreground)]">
+                  MCP (Claude Desktop, Cursor, etc.)
+                </span>
+              </div>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Paste a JSON config, restart, done. Works with any
+                MCP-compatible client.
+              </p>
+            </Link>
+            <Link
+              href="/openclaw"
+              className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 hover:border-[var(--accent)]/40 transition-colors group"
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-sm">🦞</span>
+                <span className="text-sm font-medium text-[var(--foreground)]">
+                  OpenClaw
+                </span>
+              </div>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Connect your OpenClaw agent to football AI skills. One-click
+                install.
+              </p>
+            </Link>
+            <Link
+              href="/"
+              className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 hover:border-[var(--accent)]/40 transition-colors group"
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-2 h-2 rounded-full bg-[var(--success)]" />
+                <span className="text-sm font-medium text-[var(--foreground)]">
+                  Try on the web
+                </span>
+              </div>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                No setup needed. Try every tool free in your browser right
+                now.
+              </p>
+            </Link>
+          </div>
+        </div>
+
+        {/* MCP Setup — 3 steps */}
+        <div id="mcp-setup" className="scroll-mt-8 mb-12">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
+            MCP setup in 3 steps
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <div className="text-2xl font-bold text-[var(--accent)] mb-2">1</div>
+              <h3 className="font-medium text-[var(--foreground)] mb-1">
+                Copy the config
+              </h3>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Grab the JSON snippet below and paste it into your Claude
+                Desktop settings.
+              </p>
+            </div>
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <div className="text-2xl font-bold text-[var(--accent)] mb-2">2</div>
+              <h3 className="font-medium text-[var(--foreground)] mb-1">
+                Restart Claude
+              </h3>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Claude Desktop picks up the new tools automatically on restart.
+              </p>
+            </div>
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <div className="text-2xl font-bold text-[var(--accent)] mb-2">3</div>
+              <h3 className="font-medium text-[var(--foreground)] mb-1">
+                Start coaching
+              </h3>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                Ask Claude to plan a session, check a law, or animate a drill.
+                It just works.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* MCP Servers */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
-            Servers
+            Available servers
           </h2>
           <div className="space-y-6">
             {servers.map((server) => (
@@ -90,7 +179,7 @@ export default function McpPage() {
                 key={server.path}
                 className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6"
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1">
                   <h3 className="text-lg font-semibold text-[var(--foreground)]">
                     {server.name}
                   </h3>
@@ -103,6 +192,9 @@ export default function McpPage() {
                     {server.productUrl.replace("https://", "")}
                   </a>
                 </div>
+                <p className="text-xs text-[var(--muted)] mb-2">
+                  {server.tagline}
+                </p>
                 <p className="text-sm text-[var(--muted-foreground)] mb-4">
                   {server.description}
                 </p>
@@ -162,14 +254,14 @@ export default function McpPage() {
         {/* All-in-one config */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
-            All-in-one config
+            Get everything at once
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] mb-4">
-            Add all 3 servers to Claude Desktop at once. Paste this into your{" "}
+            One config, all 3 servers, 11 tools. Paste this into your{" "}
             <code className="text-[var(--accent)]">
               claude_desktop_config.json
             </code>{" "}
-            file.
+            and restart Claude.
           </p>
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
             <pre className="text-xs text-[var(--foreground)] overflow-x-auto">
@@ -200,10 +292,10 @@ export default function McpPage() {
         {/* Registries */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
-            Registry listings
+            Also available on
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] mb-4">
-            AI Football MCP servers are listed on these registries:
+            Find AI Football tools on these MCP registries:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
@@ -238,24 +330,30 @@ export default function McpPage() {
         {/* CTA */}
         <div className="text-center bg-[var(--card)] border border-[var(--border)] rounded-xl p-8">
           <h2 className="text-xl font-semibold text-[var(--foreground)] mb-2">
-            Install now
+            Ready to try it?
           </h2>
-          <p className="text-sm text-[var(--muted-foreground)] mb-4 max-w-md mx-auto">
-            Follow the step-by-step guide to add football AI tools to Claude
-            Desktop in under 2 minutes.
+          <p className="text-sm text-[var(--muted-foreground)] mb-5 max-w-md mx-auto">
+            Pick your method. You will be planning sessions from your AI
+            assistant in under 2 minutes.
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/docs/claude-desktop"
-              className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors"
+              className="text-sm font-medium px-5 py-2.5 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors"
             >
-              Claude Desktop Guide
+              Claude Desktop setup guide
             </Link>
             <Link
               href="/openclaw"
-              className="text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+              className="text-sm font-medium px-5 py-2.5 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
             >
-              OpenClaw Guide
+              🦞 OpenClaw setup guide
+            </Link>
+            <Link
+              href="/"
+              className="text-sm font-medium px-5 py-2.5 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              Try on the web first
             </Link>
           </div>
         </div>

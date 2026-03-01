@@ -148,7 +148,7 @@ export default function ApiDocsPage() {
               code={`MCP Gateway:  https://mcp.360tft.com/{product}/mcp
 REST API:     https://mcp.360tft.com/{product}/api/{tool_name}
 
-Products: footballgpt, refereegpt, coachreflect`}
+Products: footballgpt, refereegpt, coachreflect, playerreflection`}
             />
           </div>
           <p className="text-xs text-[var(--muted)] mt-2">
@@ -184,16 +184,24 @@ Products: footballgpt, refereegpt, coachreflect`}
                   <td className="px-4 py-2.5 text-[var(--muted-foreground)]">$0</td>
                 </tr>
                 <tr className="border-b border-[var(--border)]">
-                  <td className="px-4 py-2.5 text-[var(--foreground)]">Pro</td>
+                  <td className="px-4 py-2.5 text-[var(--foreground)]">Personal (bolt-on)</td>
                   <td className="px-4 py-2.5 text-[var(--muted-foreground)]">100</td>
-                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">
-                    Product subscription
-                  </td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">$4.99/mo per product</td>
+                </tr>
+                <tr className="border-b border-[var(--border)]">
+                  <td className="px-4 py-2.5 text-[var(--foreground)]">Builder</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">1,000</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">$79/month</td>
+                </tr>
+                <tr className="border-b border-[var(--border)]">
+                  <td className="px-4 py-2.5 text-[var(--foreground)]">Scale</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">5,000</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">$349/month</td>
                 </tr>
                 <tr>
-                  <td className="px-4 py-2.5 text-[var(--foreground)]">Developer</td>
-                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">1,000</td>
-                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">$29/month</td>
+                  <td className="px-4 py-2.5 text-[var(--foreground)]">Enterprise</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">Custom</td>
+                  <td className="px-4 py-2.5 text-[var(--muted-foreground)]">Contact us</td>
                 </tr>
               </tbody>
             </table>
@@ -202,6 +210,35 @@ Products: footballgpt, refereegpt, coachreflect`}
             Rate limit resets at midnight UTC. The response includes an
             X-RateLimit-Remaining header.
           </p>
+        </div>
+
+        {/* Two access paths */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-3">
+            Two ways to get API access
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <h3 className="font-medium text-[var(--foreground)] mb-2">
+                1. Personal bolt-on
+              </h3>
+              <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+                $4.99/mo on each product site. 100 calls/day for that product. Best for personal projects using one product.
+              </p>
+            </div>
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+              <h3 className="font-medium text-[var(--foreground)] mb-2">
+                2. Developer plan
+              </h3>
+              <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+                $79+/mo on{" "}
+                <Link href="/developer" className="text-[var(--accent)] hover:underline">
+                  AI Football
+                </Link>
+                . 1,000+ calls/day across ALL products with one key. Best for apps, integrations, and multi-product builds.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Error codes */}
@@ -434,6 +471,59 @@ Products: footballgpt, refereegpt, coachreflect`}
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer tft_sk_your_key_here" \\
   -d '{"message": "What have I improved on most this season?"}'`}
+            />
+          </div>
+        </div>
+
+        {/* PlayerReflection endpoints */}
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
+            PlayerReflection
+          </h2>
+          <p className="text-sm text-[var(--muted-foreground)] mb-4">
+            Base: <code className="text-xs font-mono text-[var(--accent)]">https://mcp.360tft.com/playerreflection/api/</code>
+          </p>
+          <div className="space-y-4">
+            <EndpointSection
+              product="PlayerReflection"
+              tool="log-reflection"
+              description="Log player session reflections with mood, energy, and performance self-assessment."
+              params={[
+                { name: "reflection", required: true, description: "The player's session reflection" },
+                { name: "sessionType", required: false, description: "training, match, individual, gym, recovery" },
+                { name: "mood", required: false, description: "great, good, neutral, challenging, difficult" },
+                { name: "energy", required: false, description: "high, medium, low" },
+              ]}
+              curl={`curl -X POST https://mcp.360tft.com/playerreflection/api/log_reflection \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer tft_sk_your_key_here" \\
+  -d '{"reflection": "Felt sharp today. First touch was much better than last week."}'`}
+            />
+            <EndpointSection
+              product="PlayerReflection"
+              tool="get-patterns"
+              description="Analyse player reflections to find patterns in performance, mood, and development areas."
+              params={[
+                { name: "timeRange", required: false, description: "week, month, quarter, all" },
+                { name: "focus", required: false, description: "technical, tactical, physical, mental" },
+              ]}
+              curl={`curl -X POST https://mcp.360tft.com/playerreflection/api/get_patterns \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer tft_sk_your_key_here" \\
+  -d '{"timeRange": "month"}'`}
+            />
+            <EndpointSection
+              product="PlayerReflection"
+              tool="player-chat"
+              description="Chat with your reflection history. Ask questions about your development as a player."
+              params={[
+                { name: "message", required: true, description: "Your question" },
+                { name: "context", required: false, description: "Additional context" },
+              ]}
+              curl={`curl -X POST https://mcp.360tft.com/playerreflection/api/player_chat \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer tft_sk_your_key_here" \\
+  -d '{"message": "What areas have I improved most this month?"}'`}
             />
           </div>
         </div>

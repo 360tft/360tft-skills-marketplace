@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { notifyToolSubmission } from "@/lib/email";
 import { scoreSubmission } from "@/lib/rubric";
+import { scanSubmission } from "@/lib/security-scan";
 import { startSequence } from "@/lib/email-sequences";
 
 const VALID_TOOL_TYPES = ["mcp_server", "api", "claude_skill", "custom_gpt"];
@@ -61,6 +62,17 @@ export async function POST(req: NextRequest) {
       email: email.toLowerCase().trim(),
     });
 
+    // Run security scan
+    const security = await scanSubmission({
+      name: name.trim(),
+      description: description.trim(),
+      toolType: toolType || undefined,
+      connectionUrl: connectionUrl?.trim() || undefined,
+    });
+
+    // Block auto-approve if risk score > 25
+    const autoApprove = rubric.autoApprove && security.riskScore <= 25;
+
     const { error } = await supabase.from("tool_submissions").insert({
       name: name.trim(),
       description: description.trim(),
@@ -70,9 +82,11 @@ export async function POST(req: NextRequest) {
       mcp_url: mcpUrl?.trim() || connectionUrl?.trim() || null,
       api_docs_url: apiDocsUrl?.trim() || null,
       email: email.toLowerCase().trim(),
-      status: rubric.autoApprove ? "approved" : "pending",
+      status: autoApprove ? "approved" : "pending",
       rubric_score: rubric.score,
       rubric_flags: rubric.flags,
+      risk_score: security.riskScore,
+      risk_flags: security.riskFlags,
     });
 
     if (error) {

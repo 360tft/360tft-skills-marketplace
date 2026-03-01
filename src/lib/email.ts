@@ -198,7 +198,7 @@ export async function sendRateLimitWarning(
         You've used <strong style="color: #fff;">${usage}</strong> of your <strong style="color: #fff;">${limit}</strong> daily API calls (${Math.round((usage / limit) * 100)}%).
       </p>
       <p style="color: #aaa; line-height: 1.6;">
-        Upgrade to the Developer tier for 1,000 calls per day.
+        Upgrade to Builder ($79/month, 1,000 calls/day) or Scale ($349/month, 5,000 calls/day).
       </p>
       <p style="margin-top: 24px;">
         <a href="https://aifootball.co/developer" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
@@ -407,6 +407,67 @@ export async function sendSponsorshipCancelled(
       <p style="margin-top: 24px;">
         <a href="https://aifootball.co/dashboard/creator" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
           Reactivate sponsorship
+        </a>
+      </p>
+      <p style="color: #666; font-size: 12px; margin-top: 32px;">
+        AI Football — The AI agent marketplace for football
+      </p>
+    </div>
+    `
+  );
+}
+
+export async function sendDeveloperTierConfirmation(
+  email: string,
+  tier: string,
+  limit: number
+) {
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+  await send(
+    email,
+    `Your ${tierLabel} plan is active`,
+    `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #fff;">${tierLabel} plan active</h2>
+      <p style="color: #aaa; line-height: 1.6;">
+        Your API keys have been upgraded to the <strong style="color: #fff;">${tierLabel}</strong> tier. You now have <strong style="color: #fff;">${limit.toLocaleString()}</strong> API calls per day across all products.
+      </p>
+      <p style="color: #aaa; line-height: 1.6;">
+        All your active keys have been upgraded automatically. New keys you create will also use the ${tierLabel} tier.
+      </p>
+      <p style="margin-top: 24px;">
+        <a href="https://aifootball.co/developer" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          View your keys
+        </a>
+      </p>
+      <p style="color: #666; font-size: 12px; margin-top: 32px;">
+        AI Football — The AI agent marketplace for football
+      </p>
+    </div>
+    `
+  );
+}
+
+export async function sendDeveloperTierCancelled(
+  email: string,
+  tier: string
+) {
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+  await send(
+    email,
+    `Your ${tierLabel} plan has ended`,
+    `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #fff;">${tierLabel} plan ended</h2>
+      <p style="color: #aaa; line-height: 1.6;">
+        Your <strong style="color: #fff;">${tierLabel}</strong> subscription has been cancelled. Your keys have been downgraded to the free tier (10 calls/day).
+      </p>
+      <p style="color: #aaa; line-height: 1.6;">
+        You can resubscribe at any time from the Developer Portal.
+      </p>
+      <p style="margin-top: 24px;">
+        <a href="https://aifootball.co/developer" style="display: inline-block; background: #16a34a; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Resubscribe
         </a>
       </p>
       <p style="color: #666; font-size: 12px; margin-top: 32px;">

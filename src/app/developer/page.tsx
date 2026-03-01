@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { createClient } from "@/lib/supabase/client";
@@ -165,6 +167,7 @@ function KeyManagement({ user }: { user: User }) {
             <option value="footballgpt">FootballGPT</option>
             <option value="refereegpt">RefereeGPT</option>
             <option value="coachreflect">CoachReflect</option>
+            <option value="playerreflection">PlayerReflection</option>
           </select>
           <button
             onClick={handleCreateKey}
@@ -175,7 +178,7 @@ function KeyManagement({ user }: { user: User }) {
           </button>
         </div>
         <p className="text-xs text-[var(--muted)] mt-2">
-          Free tier: 10 calls/day. Upgrade to Developer ($29/month) for 1,000 calls/day.
+          Free tier: 10 calls/day. Upgrade to Builder ($79/month) for 1,000 calls/day.
         </p>
         {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
       </div>
@@ -206,8 +209,12 @@ function KeyManagement({ user }: { user: User }) {
                     </span>
                     <span
                       className={`text-[10px] px-1.5 py-0.5 rounded border ${
-                        key.tier === "developer"
+                        key.tier === "builder"
                           ? "bg-[var(--accent)]/15 text-[var(--accent)] border-[var(--accent)]/30"
+                          : key.tier === "scale"
+                          ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
+                          : key.tier === "enterprise"
+                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
                           : key.tier === "pro"
                           ? "bg-purple-500/15 text-purple-400 border-purple-500/30"
                           : "bg-white/5 text-[var(--muted)] border-white/10"
@@ -244,9 +251,12 @@ function KeyManagement({ user }: { user: User }) {
   );
 }
 
-export default function DeveloperPage() {
+function DeveloperPageContent() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const upgraded = searchParams.get("upgraded");
+  const upgradedTier = searchParams.get("tier");
 
   useEffect(() => {
     const supabase = createClient();
@@ -255,6 +265,26 @@ export default function DeveloperPage() {
       setLoading(false);
     });
   }, []);
+
+  const handleSubscribe = async (tier: "builder" | "scale") => {
+    if (!user) {
+      window.location.href = "/auth/login?redirectTo=/developer";
+      return;
+    }
+    try {
+      const res = await fetch("/api/stripe/developer-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      // Silent fail
+    }
+  };
 
   if (loading) {
     return (
@@ -272,17 +302,29 @@ export default function DeveloperPage() {
     <>
       <Header />
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Success banner */}
+        {upgraded === "success" && (
+          <div className="bg-[var(--success)]/10 border border-[var(--success)]/30 rounded-xl p-5 mb-6">
+            <h3 className="font-semibold text-green-400 mb-1">
+              {upgradedTier ? `${upgradedTier.charAt(0).toUpperCase() + upgradedTier.slice(1)} plan activated` : "Plan activated"}
+            </h3>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              All your active API keys have been upgraded. New keys will also use your new tier.
+            </p>
+          </div>
+        )}
+
         <h1 className="text-3xl font-bold text-[var(--foreground)] mb-3">
           Developer Portal
         </h1>
         <p className="text-[var(--muted-foreground)] leading-relaxed mb-8 max-w-2xl">
           Build AI tools for football coaches using AI Football infrastructure.
-          Get API access to FootballGPT, RefereeGPT, CoachReflect, and more.
+          Get API access to FootballGPT, RefereeGPT, CoachReflect, PlayerReflection, and more.
           Publish your tools on this marketplace and earn revenue.
         </p>
 
         {/* Key management section */}
-        <div className="mb-10">
+        <div id="keys" className="mb-10">
           {user ? (
             <KeyManagement user={user} />
           ) : (
@@ -341,7 +383,7 @@ export default function DeveloperPage() {
         <h2 className="text-xl font-semibold text-[var(--foreground)] mb-4">
           API Pricing
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="font-medium text-[var(--foreground)] mb-1">Free</h3>
             <p className="text-2xl font-bold text-[var(--foreground)] mb-3">
@@ -353,34 +395,86 @@ export default function DeveloperPage() {
               <li>Per-tool usage tracking</li>
               <li>Max 5 keys per email</li>
             </ul>
+            <a
+              href="#keys"
+              className="mt-4 block text-center text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              Get Started
+            </a>
           </div>
           <div className="bg-[var(--card)] border-2 border-[var(--accent)] rounded-xl p-5">
             <h3 className="font-medium text-[var(--accent)] mb-1">
-              Developer
+              Builder
             </h3>
             <p className="text-2xl font-bold text-[var(--foreground)] mb-3">
-              $29<span className="text-sm font-normal text-[var(--muted)]">/month</span>
+              $79<span className="text-sm font-normal text-[var(--muted)]">/month</span>
             </p>
             <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
               <li>1,000 API calls per day</li>
+              <li>All products, one key</li>
               <li>Per-tool analytics</li>
               <li>Priority support</li>
-              <li>Publish tools to marketplace</li>
             </ul>
+            <button
+              onClick={() => handleSubscribe("builder")}
+              className="mt-4 w-full text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors"
+            >
+              Subscribe
+            </button>
           </div>
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
             <h3 className="font-medium text-[var(--foreground)] mb-1">
-              Builder Bootcamp
+              Scale
             </h3>
             <p className="text-2xl font-bold text-[var(--foreground)] mb-3">
-              $497<span className="text-sm font-normal text-[var(--muted)]"> one-time</span>
+              $349<span className="text-sm font-normal text-[var(--muted)]">/month</span>
             </p>
             <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
-              <li>Everything in Developer</li>
-              <li>FootballGPT codebase</li>
-              <li>30-day curriculum</li>
-              <li>Weekly calls with Kevin</li>
+              <li>5,000 API calls per day</li>
+              <li>All products, one key</li>
+              <li>Per-tool analytics</li>
+              <li>Priority support</li>
             </ul>
+            <button
+              onClick={() => handleSubscribe("scale")}
+              className="mt-4 w-full text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              Subscribe
+            </button>
+          </div>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5">
+            <h3 className="font-medium text-[var(--foreground)] mb-1">
+              Enterprise
+            </h3>
+            <p className="text-2xl font-bold text-[var(--foreground)] mb-3">
+              Custom
+            </p>
+            <ul className="text-sm text-[var(--muted-foreground)] space-y-2">
+              <li>Unlimited API calls</li>
+              <li>All products, one key</li>
+              <li>Dedicated support</li>
+              <li>Custom integrations</li>
+            </ul>
+            <a
+              href="mailto:kevin@360tft.com?subject=Enterprise%20API%20access"
+              className="mt-4 block text-center text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              Contact Us
+            </a>
+          </div>
+        </div>
+
+        {/* Personal bolt-on cross-link */}
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 mb-10">
+          <p className="text-sm text-[var(--muted-foreground)] mb-3">
+            <strong className="text-[var(--foreground)]">Just want personal access to one product?</strong>{" "}
+            Each offers a $4.99/mo API bolt-on with 100 calls/day:
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a href="https://footballgpt.co" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--accent)] hover:underline">FootballGPT</a>
+            <a href="https://coachreflection.com" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--accent)] hover:underline">CoachReflect</a>
+            <a href="https://refereegpt.co" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--accent)] hover:underline">RefereeGPT</a>
+            <a href="https://playerreflection.360tft.com" target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--accent)] hover:underline">PlayerReflection</a>
           </div>
         </div>
 
@@ -409,6 +503,10 @@ export default function DeveloperPage() {
     "coachreflect": {
       "type": "streamable-http",
       "url": "https://mcp.360tft.com/coachreflect/mcp"
+    },
+    "playerreflection": {
+      "type": "streamable-http",
+      "url": "https://mcp.360tft.com/playerreflection/mcp"
     }
   }
 }`}
@@ -449,5 +547,23 @@ export default function DeveloperPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function DeveloperPage() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <Header />
+          <main className="max-w-4xl mx-auto px-4 py-16 text-center">
+            <p className="text-[var(--muted)]">Loading...</p>
+          </main>
+          <Footer />
+        </>
+      }
+    >
+      <DeveloperPageContent />
+    </Suspense>
   );
 }

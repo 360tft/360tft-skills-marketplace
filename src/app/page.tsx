@@ -180,6 +180,23 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* New to AI? */}
+        <div className="mb-10 bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 text-center">
+          <h3 className="font-medium text-[var(--foreground)] mb-1">New to AI?</h3>
+          <p className="text-sm text-[var(--muted-foreground)] mb-3">
+            If none of this makes sense yet, start here. Learn what AI tools
+            are and build your first one in under an hour.
+          </p>
+          <a
+            href="https://360tft.co.uk/first-agent"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-[var(--accent)] hover:underline"
+          >
+            Start the free course
+          </a>
+        </div>
+
         {/* Platform badges */}
         <div className="flex items-center justify-center gap-3 mb-10 flex-wrap">
           <Link
@@ -311,6 +328,30 @@ export default function HomePage() {
               <p className="text-xs text-[var(--muted-foreground)]">
                 5 free tries per tool, per day.
               </p>
+            </Link>
+          </div>
+        </div>
+
+        {/* For Developers */}
+        <div className="mt-16 bg-[var(--card)] border border-[var(--border)] rounded-xl p-8 text-center">
+          <h2 className="text-xl font-semibold text-[var(--foreground)] mb-2">
+            For Developers
+          </h2>
+          <p className="text-sm text-[var(--muted-foreground)] mb-4 max-w-md mx-auto">
+            Build apps on top of football AI. Access all products through one API key.
+          </p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Link
+              href="/developer"
+              className="text-sm font-medium px-4 py-2 rounded-lg bg-[var(--accent)] text-black hover:bg-[var(--accent-hover)] transition-colors"
+            >
+              View Developer Plans
+            </Link>
+            <Link
+              href="/docs/api"
+              className="text-sm font-medium px-4 py-2 rounded-lg border border-[var(--border)] text-[var(--foreground)] hover:bg-white/5 transition-colors"
+            >
+              API Docs
             </Link>
           </div>
         </div>

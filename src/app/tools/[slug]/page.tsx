@@ -81,6 +81,7 @@ function TryItDemo({ tool }: { tool: Tool }) {
   const [query, setQuery] = useState("");
   const [response, setResponse] = useState("");
   const [poweredBy, setPoweredBy] = useState<{ name: string; url: string } | null>(null);
+  const [rateLimitProduct, setRateLimitProduct] = useState<{ name: string; url: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [triesLeft, setTriesLeft] = useState(2);
 
@@ -108,8 +109,13 @@ function TryItDemo({ tool }: { tool: Tool }) {
         if (data.poweredBy) setPoweredBy(data.poweredBy);
         setTriesLeft((prev) => prev - 1);
       } else if (res.status === 429) {
+        const errorData = await res.json().catch(() => null);
+        if (errorData?.product) {
+          setRateLimitProduct(errorData.product);
+        }
+        setTriesLeft(0);
         setResponse(
-          "You've reached the free trial limit. Sign up or subscribe for unlimited access."
+          errorData?.message || "You've used your free tries today."
         );
       } else {
         setResponse("Something went wrong. Please try again.");
@@ -148,7 +154,22 @@ function TryItDemo({ tool }: { tool: Tool }) {
         {response && (
           <div className="bg-[var(--background)] border border-[var(--border)] rounded-lg p-4 text-sm text-[var(--foreground)] leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">
             {response}
-            {poweredBy && (
+            {rateLimitProduct?.url && triesLeft <= 0 && (
+              <div className="mt-3 pt-3 border-t border-[var(--border)]">
+                <a
+                  href={rateLimitProduct.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black text-xs font-medium hover:bg-[var(--accent-hover)] transition-colors"
+                >
+                  Get full access on {rateLimitProduct.name}
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            )}
+            {poweredBy && triesLeft > 0 && (
               <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center gap-1.5 text-xs text-[var(--muted)]">
                 Powered by{" "}
                 <a
@@ -165,9 +186,35 @@ function TryItDemo({ tool }: { tool: Tool }) {
         )}
 
         <p className="text-xs text-[var(--muted)]">
-          {triesLeft > 0
-            ? `${triesLeft} free tries remaining today`
-            : "Free tries used up. Install this tool for unlimited access."}
+          {triesLeft > 0 ? (
+            `${triesLeft} free tries remaining today`
+          ) : rateLimitProduct?.url ? (
+            <>
+              Free tries used up.{" "}
+              <a
+                href={rateLimitProduct.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--accent)] hover:underline"
+              >
+                Get full access on {rateLimitProduct.name}
+              </a>
+            </>
+          ) : tool.productUrl ? (
+            <>
+              Free tries used up.{" "}
+              <a
+                href={tool.productUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--accent)] hover:underline"
+              >
+                Get full access
+              </a>
+            </>
+          ) : (
+            "Free tries used up. Check back tomorrow."
+          )}
         </p>
       </div>
 
@@ -397,6 +444,33 @@ function InstallModal({
                 .
               </p>
             </div>
+
+            {tool.productUrl && (
+              <div className="bg-[var(--background)] border border-[var(--border)] rounded-lg p-3 mt-2">
+                <p className="text-xs text-[var(--muted-foreground)]">
+                  <strong className="text-[var(--foreground)]">
+                    Want API access?
+                  </strong>{" "}
+                  Personal bolt-on ($4.99/mo) at{" "}
+                  <a
+                    href={tool.productUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[var(--accent)] hover:underline"
+                  >
+                    {tool.productUrl.replace("https://", "").replace(/\/$/, "")}
+                  </a>{" "}
+                  or developer access at{" "}
+                  <a
+                    href="https://aifootball.co/developer"
+                    className="text-[var(--accent)] hover:underline"
+                  >
+                    aifootball.co/developer
+                  </a>
+                  .
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

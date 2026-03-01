@@ -8,6 +8,7 @@ const PRODUCT_PREFIXES: Record<string, string> = {
   refereegpt: "rgpt",
   cruisegpt: "cgpt",
   coachreflect: "cr",
+  playerreflection: "pr",
   all: "tft",
 };
 
@@ -15,8 +16,11 @@ const PRODUCT_PREFIXES: Record<string, string> = {
 export const TIER_LIMITS: Record<string, number> = {
   free: 10,
   pro: 100,
-  developer: 1000,
+  builder: 1000,
+  scale: 5000,
+  enterprise: 999999,
   unlimited: 999999,
+  developer: 1000, // backward compat alias until migration confirmed
 };
 
 export interface ApiKey {

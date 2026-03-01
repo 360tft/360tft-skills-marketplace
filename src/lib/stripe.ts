@@ -69,3 +69,13 @@ export function getStripePriceId(
   };
   return map[tier][interval];
 }
+
+export type DeveloperTier = "builder" | "scale";
+
+export function getDeveloperPriceId(tier: DeveloperTier): string | undefined {
+  const map: Record<DeveloperTier, string | undefined> = {
+    builder: process.env.STRIPE_PRICE_BUILDER,
+    scale: process.env.STRIPE_PRICE_SCALE,
+  };
+  return map[tier];
+}
